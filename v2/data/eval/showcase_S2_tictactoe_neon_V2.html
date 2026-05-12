@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>井字棋</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, #000, #101);
+      padding: 18px;
+      border-radius: 18px;
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .title {
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 14px;
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .scoreboard {
+      display: grid;
+      gap: 12px;
+      width: 100%;
+      margin-top: 14px;
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .scoreboard__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 2rem;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.16);
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .result {
+      font-size: 2.4rem;
+      text-align: center;
+      margin-top: 14px;
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .board {
+      display: grid;
+      gap: 8px;
+      width: 100%;
+      font-size: 48px;
+      font-weight: 900;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .cell {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 24px;
+      transition: transform 0.3s;
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .player {
+      transform: scale(1.08);
+      background: linear-gradient(135deg, #ff6a6a, #ff7989);
+    }
+    .ai {
+      transform: scale(1.08);
+      background: linear-gradient(135deg, #82b1ff, #57a9e3);
+    }
+    .reset {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.6rem;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #101, #282);
+      color: #fff;
+      margin-top: 14px;
+      animation: glow 1.2s ease-in-out infinite;
+    }
+    .reset:hover {
+      background: linear-gradient(135deg, #181, #303);
+    }
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 12px #fff; }
+      10%, 30%, 50%, 70%, 90% { text-shadow: 0 0 16px #fff; }
+    }
+  </style>
+</head>
+<body>
+  <div class="title">井字棋</div>
+  <div class="scoreboard">
+    <div class="scoreboard__item" data-player="player">0</div>
+    <div class="result">vs</div>
+    <div class="scoreboard__item" data-player="ai">0</div>
+  </div>
+  <div class="board">
+    <div class="cell player" data-row="0" data-col="0"></div>
+    <div class="cell player" data-row="0" data-col="1"></div>
+    <div class="cell player" data-row="0" data-col="2"></div>
+    <div class="cell player" data-row="1" data-col="0"></div>
+    <div class="cell player" data-row="1" data-col="1"></div>
+    <div class="cell player" data-row="1" data-col="2"></div>
+    <div class="cell player" data-row="2" data-col="0"></div>
+    <div class="cell player" data-row="2" data-col="1"></div>
+    <div class="cell player" data-row="2" data-col="2"></div>
+  </div>
+  <button class="reset" onclick="location.reload()">重置比分</button>
+  <script>
+    const cells = [...document.querySelectorAll('.cell')];
+    const scoreboard = document.querySelectorAll('.scoreboard__item');
+    const resetBtn = document.querySelector('.reset');
+    let currentPlayer = 'player';
+    let aiPlayer = 'ai';
+    let playerScore = 0;
+    let aiScore = 0;
+    let tieScore = 0;
+
+    function checkWin() {
+      const winCombinations = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]],
+      ];
+      for (const combination of winCombinations) {
+        const [a, b, c] = combination;
+        if (
+          cells[a[0]].textContent === currentPlayer &&
+          cells[a[1]].textContent === currentPlayer &&
+          cells[a[2]].textContent === currentPlayer
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function checkTie() {
+      for (const cell of cells) {
+        if (cell.textContent === '') return false;
+      }
+      return true;
+    }
+
+    function updateScoreboard() {
+      scoreboard[0].textContent = playerScore;
+      scoreboard[1].textContent = 'vs';
+      scoreboard[2].textContent = aiScore;
+    }
+
+    function handleCellClick(event) {
+      const cell = event.target;
+      if (cell.textContent !== '') return;
+      cell.textContent = currentPlayer;
+      if (checkWin()) {
+        updateScoreboard();
+        alert(`玩家 ${currentPlayer} 赢了!`);
+        playerScore++;
+        setTimeout(() => {
+          resetGame();
+        }, 1000);
+      } else if (checkTie()) {
+        updateScoreboard();
+        alert(`平局!`);
+        tieScore++;
+        setTimeout(() => {
+          resetGame();
+        }, 1000);
+      } else {
+        currentPlayer = currentPlayer === 'player' ? 'ai' : 'player';
+        setTimeout(() => {
+          placeAiMove();
+        }, 500);
+      }
+    }
+
+    function placeAiMove() {
+      const availableCells = cells.filter((cell) => cell.textContent === '');
+      const randomIndex = Math.floor(Math.random() * availableCells.length);
+      availableCells[randomIndex].textContent = aiPlayer;
+      if (checkWin()) {
+        updateScoreboard();
+        alert(`AI ${aiPlayer} 赢了!`);
+        aiScore++;
+        setTimeout(() => {
+          resetGame();
+        }, 1000);
+      } else if (checkTie()) {
+        updateScoreboard();
+        alert(`平局!`);
+        tieScore++;
+        setTimeout(() => {
+          resetGame();
+        }, 1000);
+      } else {
+        currentPlayer = 'player';
+      }
+    }
+
+    function resetGame() {
+      cells.forEach((cell) => {
+        cell.textContent = '';
+      });
+      playerScore = 0;
+      aiScore = 0;
+      tieScore = 0;
+      updateScoreboard();
+      currentPlayer = 'player';
+      aiPlayer = 'ai';
+    }
+
+    cells.forEach((cell) => {
+      cell.addEventListener('click', handleCellClick);
+    });
+
+    resetBtn.addEventListener('click', resetGame);
+  </script>
+</body>
+</html>

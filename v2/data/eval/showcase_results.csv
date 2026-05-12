@@ -1,0 +1,5 @@
+model,tag,title,total_score,J,I,F,C,S,html_length,html_file
+V1,S1_morning_routine,晨间例行三合一工具,95,28,23,20,14,10,12375,showcase_S1_morning_routine_V1.html
+V1,S2_tictactoe_neon,暗色霓虹风井字棋 + 计分板,95,26,25,20,14,10,11608,showcase_S2_tictactoe_neon_V1.html
+V2,S1_morning_routine,晨间例行三合一工具,87,20,23,20,14,10,6222,showcase_S1_morning_routine_V2.html
+V2,S2_tictactoe_neon,暗色霓虹风井字棋 + 计分板,93,26,25,20,12,10,6584,showcase_S2_tictactoe_neon_V2.html

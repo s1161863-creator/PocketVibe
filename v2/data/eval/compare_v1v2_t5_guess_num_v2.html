@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>猜数字游戏</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #00a9ff, #007bff);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #00a9ff, #007bff);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .btns {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .hint {
+      color: #007bff;
+      font-weight: 700;
+      margin-top: 4px;
+      text-align: center;
+    }
+    .emoji {
+      font-size: 48px;
+      color: #007bff;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .changelog {
+      color: #6b7280;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 14px;
+      opacity: 0.81;
+    }
+    .powered {
+      text-align: center;
+      margin-top: 12px;
+      color: #6b7280;
+      font-size: 14px;
+      opacity: 0.81;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>猜数字游戏</h1>
+    <p>猜一个1到100之间的数字。</p>
+    <input id="guess" type="number" min="1" max="100" value="50" placeholder="猜数字">
+    <button onclick="checkGuess()">猜一猜</button>
+    <div class="small" id="feedback"></div>
+    <p>你还有 <span id="chances">6</span> 次机会。</p>
+    <p>游戏结束时，点击“重新开始”。</p>
+  </main>
+  <script>
+    let secret = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+    let guesses = [];
+
+    function checkGuess() {
+      attempts++;
+      const guess = parseInt(document.getElementById('guess').value);
+      guesses.push(guess);
+
+      if (guess === secret) {
+        document.getElementById('feedback').textContent = '恭喜你，猜对了！';
+        document.getElementById('chances').textContent = '';
+        document.getElementById('guess').disabled = true;
+        document.getElementById('hint').textContent = '游戏结束，点击“重新开始”';
+        document.getElementById('result').textContent = `你猜了 ${attempts} 次，猜对了！`;
+        return;
+      }
+
+      if (attempts >= 6) {
+        document.getElementById('feedback').textContent = '很遗憾，你猜错了！';
+        document.getElementById('chances').textContent = '';
+        document.getElementById('guess').disabled = true;
+        document.getElementById('hint').textContent = '游戏结束，点击“重新开始”';
+        document.getElementById('result').textContent = `你猜了 ${attempts} 次，猜错了！`;
+        return;
+      }
+
+      const difference = Math.abs(guess - secret);
+      const message = difference < 10 ? '非常接近！' : '离目标还很远。';
+      document.getElementById('feedback').textContent = message;
+      document.getElementById('chances').textContent = 6 - attempts;
+      document.getElementById('hint').textContent = `你猜了 ${guesses.join(', ')}，距离目标还差 ${difference}。`;
+      document.getElementById('guess').value = '';
+    }
+
+    document.getElementById('result').textContent = '';
+    document.getElementById('hint').textContent = '';
+  </script>
+</body>
+</html>

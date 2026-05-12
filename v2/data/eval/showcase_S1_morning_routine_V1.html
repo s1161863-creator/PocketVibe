@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>晨间例行</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #cddc39 100%);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: white;
+      color: #243147;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p.sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243147;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #cddc39 100%);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+    }
+    .code {
+      white-space: pre-wrap;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      margin-top: 12px;
+      display: block;
+      max-height: 200px;
+    }
+    pre {
+      display: block;
+      margin: 12px 0;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    code {
+      font-size: 16px;
+      white-space: nowrap;
+      background: #f6f8fa;
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+    ul.chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>晨间例行</h1>
+    <p class="sub">记录你的每日心情</p>
+    <input 
+      type="text" 
+      id="mood" 
+      placeholder="心情打卡"
+      value="😀"
+    />
+    <button onclick="saveMood()">打卡</button>
+    <div class="panel">
+      <h2>今日心情</h2>
+      <ul class="chips">
+        <li class="chip" id="mood-emoji">😀</li>
+        <li class="chip" id="mood-emoji">😊</li>
+        <li class="chip" id="mood-emoji">😐</li>
+        <li class="chip" id="mood-emoji">😔</li>
+        <li class="chip" id="mood-emoji">😡</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>待办清单</h2>
+      <ul id="todo-list"></ul>
+      <button onclick="addTodo()">添加任务</button>
+    </div>
+    <div class="panel">
+      <h2>5 分钟冥想计时器</h2>
+      <div id="timer"></div>
+      <button onclick="startTimer()">开始</button>
+      <button onclick="pauseTimer()">暂停</button>
+      <div class="small">每 4 秒切换一次呼吸引导文字</div>
+    </div>
+  </div>
+
+  <script>
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    const moods = JSON.parse(localStorage.getItem('moods')) || [];
+
+    function saveMood() {
+      const mood = document.getElementById('mood').value;
+      moods.push(mood);
+      localStorage.setItem('moods', JSON.stringify(moods));
+      updateMoodDisplay();
+    }
+
+    function updateMoodDisplay() {
+      const moodEmoji = document.getElementById('mood-emoji');
+      moodEmoji.textContent = moods[0] || '😀';
+    }
+
+    function addTodo() {
+      const todoInput = document.createElement('input');
+      todoInput.type = 'text';
+      todoInput.placeholder = '添加任务';
+      todoInput.className = 'todo-input';
+      const todoList = document.getElementById('todo-list');
+      todoList.appendChild(todoInput);
+      todoInput.focus();
+    }
+
+    function startTimer() {
+      const timer = document.getElementById('timer');
+      const minutes = 5;
+      let seconds = 0;
+      let interval = setInterval(() => {
+        if (seconds === 0) {
+          minutes--;
+          seconds = 59;
+        } else {
+          seconds--;
+        }
+        timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        if (minutes === 0 && seconds === 0) {
+          clearInterval(interval);
+          alert('时间到！');
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      const timer = document.getElementById('timer');
+      timer.textContent = '暂停';
+    }
+
+    function displayTodos() {
+      const todoList = document.getElementById('todo-list');
+      todoList.innerHTML = '';
+      todos.forEach(todo => {
+        const todoItem = document.createElement('li');
+        todoItem.textContent = todo;
+        todoList.appendChild(todoItem);
+      });
+    }
+
+    displayTodos();
+  </script>
+
+</body>
+</html>

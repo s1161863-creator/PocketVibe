@@ -1,0 +1,6 @@
+﻿tag,category,difficulty,total,J_js,I_instruct,F_func,C_css,S_struct,length,i_hits,i_total
+C1_depth_stopwatch_lap,DEPTH,high,98,30,25,20,13,10,9876,8,8
+C2_breadth_swim_timer,BREADTH,high,83,18,21,20,14,10,4656,6,7
+C3_reasoning_calc_paren,REASONING,high,82,17,22,20,13,10,4928,7,8
+C4_combination_todo_pomodoro,COMBINATION,high,93,24,25,20,14,10,6773,9,9
+C5_cross_rps_scoreboard,CROSS_CATEGORY,high,85,16,25,20,14,10,6976,9,9

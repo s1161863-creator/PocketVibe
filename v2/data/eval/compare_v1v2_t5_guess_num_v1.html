@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>猜数字</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      color: #243147;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p.sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243147;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chip.result {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+    }
+    .card.result {
+      background: #ffffff;
+      border-left: 4px solid #f7971e;
+      padding-left: 14px;
+    }
+    .btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .btn {
+      flex: 1;
+      padding: 13px 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .reset {
+      background: #ffffff;
+      color: #6b7280;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+    .submit {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: white;
+    }
+    .panel.result {
+      margin-top: 18px;
+      padding: 20px;
+      background: #ffffff;
+      border-left: 4px solid #f7971e;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .summary {
+      font-size: 16px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .stats {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul.chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    ul.chips li {
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>猜数字</h1>
+    <p class="sub">1到100之间猜</p>
+    <input type="number" name="guess" placeholder="输入你的猜测" min="1" max="100" value="50" required>
+    <div class="row">
+      <select name="difficulty">
+        <option value="easy">容易（10次）</option>
+        <option value="medium">中等（15次）</option>
+        <option value="hard">困难（20次）</option>
+      </select>
+      <button class="reset" onclick="resetGame()">重置</button>
+    </div>
+    <button class="submit" onclick="checkGuess()">提交</button>
+    <div class="panel result" id="resultPanel" style="display: none;">
+      <div class="result" id="result"></div>
+      <div class="small">
+        <span id="guessCount"></span> 次猜测
+        <span class="stats">难度： <span id="difficultyLabel"></span></span>
+      </div>
+      <ul class="chips">
+        <li class="result" id="correctChip" style="display: none;">猜对了</li>
+        <li class="result" id="lowChip" style="display: none;">猜小了</li>
+        <li class="result" id="highChip" style="display: none;">猜大了</li>
+      </ul>
+      <div class="panel result" id="summaryPanel" style="display: none;">
+        <div class="summary">你猜了 <span id="guessCountSummary"></span> 次，最终猜对了！</div>
+        <ul class="chips">
+          <li class="result" id="correctSummaryChip" style="display: none;">猜对了</li>
+          <li class="result" id="lowSummaryChip" style="display: none;">猜小了</li>
+          <li class="result" id="highSummaryChip" style="display: none;">猜大了</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    const difficultyOptions = {
+      easy: 10,
+      medium: 15,
+      hard: 20
+    };
+
+    let guessCount = 0;
+    let difficulty = "easy";
+    let correctGuess = false;
+    let guessChip = null;
+    let lowChip = null;
+    let highChip = null;
+
+    function resetGame() {
+      guessCount = 0;
+      correctGuess = false;
+      guessChip = null;
+      lowChip = null;
+      highChip = null;
+      document.getElementById("result").textContent = "";
+      document.getElementById("guessCount").textContent = "";
+      document.getElementById("difficultyLabel").textContent = difficulty;
+      document.getElementById("resultPanel").style.display = "none";
+      document.getElementById("summaryPanel").style.display = "none";
+      document.getElementById("guess").value = "50";
+      document.getElementById("difficulty").value = "easy";
+    }
+
+    function checkGuess() {
+      const guess = parseInt(document.getElementById("guess").value);
+      const difficulty = document.getElementById("difficulty").value;
+      const difficultyLimit = difficultyOptions[difficulty];
+
+      if (guess < 1 || guess > 100) {
+        alert("请输入1到100之间的数字！");
+        return;
+      }
+
+      guessCount++;
+      document.getElementById("guessCount").textContent = `${guessCount} 次猜测`;
+
+      if (guess === correctGuess) {
+        correctChip = document.createElement("li");
+        correctChip.textContent = "猜对了";
+        correctChip.classList.add("correct");
+        document.getElementById("summaryPanel").style.display = "block";
+        document.getElementById("summary").textContent = `你猜了 ${guessCount} 次，最终猜对了！`;
+        document.getElementById("correctSummaryChip").style.display = "block";
+        document.getElementById("resultPanel").style.display = "none";
+        return;
+      }
+
+      if (guess < correctGuess) {
+        lowChip = document.createElement("li");
+        lowChip.textContent = "猜小了";
+        lowChip.classList.add("low");
+        document.getElementById("resultPanel").style.display = "block";
+        document.getElementById("result").textContent = "猜小了";
+        document.getElementById("lowSummaryChip").style.display = "block";
+        return;
+      }
+
+      if (guess > correctGuess) {
+        highChip = document.createElement("li");
+        highChip.textContent = "猜大了";
+        highChip.classList.add("high");
+        document.getElementById("resultPanel").style.display = "block";
+        document.getElementById("result").textContent = "猜大了";
+        document.getElementById("highSummaryChip").style.display = "block";
+        return;
+      }
+    }
+  </script>
+</body>
+</html>

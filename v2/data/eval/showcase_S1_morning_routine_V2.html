@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>晨间例行</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #ffcc80, #ffc493);
+    }
+    main {
+      width: 100%;
+      max-width: 380px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.18);
+      padding: 18px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .card {
+      width: 100%;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+      margin-top: 14px;
+      padding: 14px;
+    }
+    p {
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 8px;
+    }
+    input, select, textarea {
+      padding: 12px 14px;
+      background: #fff;
+      color: #243144;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #ffcc80, #ffc493);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .switch {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      position: relative;
+      margin-top: 8px;
+    }
+    .slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #f6f8fa;
+      transform: scale(0.6);
+      transition: transform 0.3s ease;
+    }
+    input:checked + .slider {
+      transform: scale(1);
+    }
+    .emoji {
+      font-size: 48px;
+      color: #8b95a3;
+      margin-top: 8px;
+      display: grid;
+      place-items: center;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+    .result {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 16px;
+      color: #34495e;
+    }
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 6px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>晨间例行</h1>
+    
+    <div class="card">
+      <h2>待办清单</h2>
+      <input id="todo" placeholder="添加任务">
+      <button onclick="addTodo()">添加</button>
+      <ul id="todoList"></ul>
+    </div>
+    
+    <div class="card">
+      <h2>5 分钟冥想计时器</h2>
+      <button onclick="startMeditation()">开始</button>
+      <button onclick="stopMeditation()">暂停</button>
+      <p id="meditationCountdown"></p>
+      <p id="meditationGuide"></p>
+    </div>
+    
+    <div class="card">
+      <h2>今日心情打卡</h2>
+      <div class="row">
+        <div class="emoji" onclick="setMood('😀')"><i class="iconfont icon-smile"></i></div>
+        <div class="emoji" onclick="setMood('😊')"><i class="iconfont icon-grinning"></i></div>
+        <div class="emoji" onclick="setMood('😐')"><i class="iconfont icon-satisfied"></i></div>
+        <div class="emoji" onclick="setMood('😔')"><i class="iconfont icon-sad"></i></div>
+        <div class="emoji" onclick="setMood('😡')"><i class="iconfont icon-angry"></i></div>
+      </div>
+      <p id="moodResult"></p>
+    </div>
+    
+  </main>
+  <script>
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    const meditations = JSON.parse(localStorage.getItem('meditations')) || [];
+    const moods = JSON.parse(localStorage.getItem('moods')) || [];
+    
+    function addTodo() {
+      const todo = document.getElementById('todo').value;
+      if (todo) {
+        todos.push(todo);
+        localStorage.setItem('todos', JSON.stringify(todos));
+        document.getElementById('todoList').innerHTML += `<li>${todo}</li>`;
+        document.getElementById('todo').value = '';
+      }
+    }
+    
+    function startMeditation() {
+      if (meditations.length < 1) {
+        const countdown = 300;
+        let time = countdown;
+        let guide = '开始冥想';
+        const interval = setInterval(() => {
+          time--;
+          document.getElementById('meditationCountdown').textContent = `${time / 60} 分钟`;
+          if (time === 0) {
+            clearInterval(interval);
+            document.getElementById('meditationCountdown').textContent = '开始';
+            document.getElementById('meditationGuide').textContent = guide;
+          } else if (time % 4 === 0) {
+            guide = time === 0 ? '结束' : time === 15 ? '呼气' : '吸气';
+            document.getElementById('meditationGuide').textContent = guide;
+          }
+        }, 1000);
+      }
+    }
+    
+    function stopMeditation() {
+      clearInterval(meditations[meditations.length - 1].interval);
+      meditations.pop();
+      localStorage.setItem('meditations', JSON.stringify(meditations));
+    }
+    
+    function setMood(mood) {
+      moods.push(mood);
+      localStorage.setItem('moods', JSON.stringify(moods));
+      document.getElementById('moodResult').textContent = mood;
+    }
+    
+    function renderTodos() {
+      document.getElementById('todoList').innerHTML = todos.map(todo => `<li>${todo}</li>`).join('');
+    }
+    
+    function renderMeditations() {
+      document.getElementById('meditationsList').innerHTML = meditations.map(meditation => `<li>${meditation.mood} - ${meditation.time / 60} 分钟</li>`).join('');
+    }
+    
+    function renderMood() {
+      document.getElementById('moodResult').textContent = moods[moods.length - 1];
+    }
+    
+    renderTodos();
+    renderMeditations();
+    renderMood();
+  </script>
+</body>
+</html>

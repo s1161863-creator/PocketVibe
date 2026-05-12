@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游泳秒表</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #22465c, #2970b9);
+      margin: 0;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.24);
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    p {
+      text-align: center;
+      margin-bottom: 16px;
+      color: #6b7280;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 18px;
+      border: none;
+      border-radius: 16px;
+      margin-top: 12px;
+    }
+    input, select, textarea {
+      padding: 12px 16px;
+      background: #ffffff;
+      color: #243142;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #22465c, #2970b9);
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .row > * {
+      min-width: 100%;
+    }
+    .result {
+      font-size: 36px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .meta {
+      font-size: 14px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    .code {
+      font-size: 14px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>游泳秒表</h1>
+    <p>请将手放在屏幕中央，点击开始。</p>
+    <div class="row">
+      <input id="distance" type="text" placeholder="总距离 (50米/趟)" readonly>
+      <input id="laps" type="text" placeholder="总圈数" readonly>
+    </div>
+    <div class="row">
+      <input id="time" type="text" placeholder="时间" readonly>
+      <button id="start" class="btn btn-primary" onclick="startTimer()">开始</button>
+    </div>
+    <div class="row">
+      <button id="stop" class="btn btn-danger" onclick="stopTimer()">停止</button>
+      <button id="reset" class="btn btn-secondary" onclick="resetTimer()">重置</button>
+    </div>
+    <div class="result" id="result">00:00.000</div>
+    <div class="meta">
+      <p>设计：<a href="https://github.com/yourusername/yourrepo">你的用户名/你的仓库</a></p>
+      <p>代码：<a href="https://github.com/yourusername/yourrepo">你的用户名/你的仓库</a></p>
+    </div>
+  </main>
+  <script>
+    let timerId = null;
+    let startTime = null;
+    let laps = 0;
+    let distance = 0;
+    let result = document.getElementById('result');
+
+    function startTimer() {
+      if (timerId) return;
+      startTime = new Date();
+      timerId = setInterval(() => {
+        const now = new Date();
+        const diff = now - startTime;
+        const minutes = Math.floor(diff / 1000 / 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        const ms = Math.floor((diff % 1000) % 1000);
+        result.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+      }, 10);
+    }
+
+    function stopTimer() {
+      if (!timerId) return;
+      clearInterval(timerId);
+      timerId = null;
+      const now = new Date();
+      const diff = now - startTime;
+      const minutes = Math.floor(diff / 1000 / 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      const ms = Math.floor((diff % 1000) % 1000);
+      result.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+      laps++;
+      document.getElementById('laps').textContent = laps;
+      const distancePerLap = 50 * 1000; // 50米/趟
+      const distancePerMinute = (laps * distancePerLap) / minutes;
+      distance += distancePerMinute;
+      document.getElementById('distance').textContent = `${distance.toFixed(2)}米`;
+    }
+
+    function resetTimer() {
+      if (!timerId) return;
+      clearInterval(timerId);
+      timerId = null;
+      result.textContent = '00:00.000';
+      laps = 0;
+      document.getElementById('laps').textContent = laps;
+      distance = 0;
+      document.getElementById('distance').textContent = '0米';
+    }
+  </script>
+</body>
+</html>

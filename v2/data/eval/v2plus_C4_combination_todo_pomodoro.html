@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>番茄工作台</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2980b9, #8e44ad);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+      padding: 28px;
+      gap: 18px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #2c3e50;
+    }
+    .input-group {
+      position: relative;
+      width: 100%;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      padding: 13px 14px;
+    }
+    input, select, textarea {
+      background: #ffffff;
+      color: #2c3e50;
+      border: 2px solid #dde4ee;
+      height: 48px;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      background: linear-gradient(135deg, #2980b9, #8e44ad);
+      color: white;
+      font-weight: 700;
+    }
+    .label {
+      font-size: 14px;
+      color: #6c757d;
+      text-align: start;
+      margin-bottom: 8px;
+    }
+    .list {
+      list-style: none;
+      margin-top: 16px;
+      gap: 12px;
+    }
+    .item {
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 14px;
+      border: 2px solid #dde4ee;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .item input {
+      flex: 1;
+      border: none;
+      font-size: 16px;
+      padding: 13px 14px;
+      background: transparent;
+      border-bottom: 2px solid #dde4ee;
+    }
+    .item button {
+      font-size: 16px;
+      padding: 13px 14px;
+      background: transparent;
+      border: 2px solid #dde4ee;
+      border-radius: 0 14px 14px 0;
+      cursor: pointer;
+    }
+    .item.completed {
+      opacity: 0.5;
+      transform: translateY(2px);
+    }
+    .footer {
+      margin-top: 16px;
+      text-align: center;
+    }
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: #e0e6f0;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #2980b9, #8e44ad);
+      border-radius: 10px;
+      will-change: width;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .toggle {
+      flex: 1;
+      padding: 13px 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      background: transparent;
+      border: 2px solid #dde4ee;
+      align-items: center;
+      justify-content: center;
+      color: #2c3e50;
+      font-weight: 700;
+    }
+    .timer {
+      font-size: 48px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 8px;
+      color: #2980b9;
+    }
+    .status {
+      font-size: 16px;
+      text-align: center;
+      color: #6c757d;
+      margin-top: 8px;
+    }
+    .result {
+      font-size: 16px;
+      text-align: center;
+      color: #dc3545;
+      margin-top: 12px;
+    }
+    .shadow {
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+    .gradient {
+      background: linear-gradient(135deg, #2980b9, #8e44ad);
+      border-radius: 18px;
+      padding: 14px;
+      will-change: transform;
+      transform-origin: center;
+      transition: transform 0.2s ease;
+    }
+    .gradient:hover {
+      transform: translateY(-2px);
+    }
+    .small {
+      font-size: 14px;
+      color: #6c757d;
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="card shadow rounded-100">
+    <h1>番茄工作台</h1>
+    <div class="input-group">
+      <input id="task" type="text" placeholder="添加待办事项" required>
+      <button onclick="addTask()">添加</button>
+    </div>
+    <div class="list" id="todo">
+      <!-- 待办事项列表 -->
+    </div>
+    <div class="footer">
+      <div class="progress" id="timer">
+        <div class="progress-bar" id="bar"></div>
+      </div>
+      <p id="status" class="small">准备开始</p>
+    </div>
+  </main>
+  <script>
+    let tasks = [];
+    let timer = null;
+    let currentTask = null;
+    let taskIndex = 0;
+    const tasksEl = document.getElementById('todo');
+    const taskInput = document.getElementById('task');
+    const timerEl = document.getElementById('timer');
+    const statusEl = document.getElementById('status');
+    const barEl = document.getElementById('bar');
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      tasks.push(text);
+      taskInput.value = '';
+      renderTasks();
+      startTimer();
+    }
+
+    function renderTasks() {
+      tasksEl.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        if (index === taskIndex) {
+          item.classList.add('completed');
+        }
+        item.innerHTML = `
+          <input type="checkbox" ${index === taskIndex ? 'checked' : ''} onclick="toggleTask(${index})">
+          <span>${task}</span>
+          <button onclick="removeTask(${index})">删除</button>
+        `;
+        tasksEl.appendChild(item);
+      });
+    }
+
+    function toggleTask(index) {
+      tasks[index] = tasks[index].split('').reverse().join('');
+      renderTasks();
+    }
+
+    function removeTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
+      if (index === taskIndex) {
+        taskIndex = Math.max(0, taskIndex - 1);
+      }
+      startTimer();
+    }
+
+    function startTimer() {
+      if (timer) return;
+      const task = tasks[taskIndex];
+      if (!task) return;
+      taskIndex = (taskIndex + 1) % tasks.length;
+      currentTask = task;
+      statusEl.textContent = '准备开始';
+      barEl.style.width = '0%';
+      timer = setInterval(() => {
+        const width = parseFloat(barEl.style.width) || 0;
+        if (width >= 100) {
+          finishTask();
+          return;
+        }
+        barEl.style.width = `${width + 1}%`;
+      }, 1000);
+    }
+
+    function finishTask() {
+      statusEl.textContent = '已完成';
+      timerEl.textContent = '00:25';
+      barEl.style.width = '100%';
+      setTimeout(() => {
+        statusEl.textContent = '准备开始';
+        barEl.style.width = '0%';
+        clearInterval(timer);
+        timer = null;
+      }, 25000);
+      taskIndex = (taskIndex + 1) % tasks.length;
+      startTimer();
+    }
+  </script>
+</body>
+</html>

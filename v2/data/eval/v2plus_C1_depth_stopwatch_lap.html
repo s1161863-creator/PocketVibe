@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>分段秒表</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #1890ff, #34d8eb);
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.32);
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 14px;
+      text-align: center;
+      color: #1367ab;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.16);
+      color: #313846;
+      font-size: 16px;
+      border: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      background: linear-gradient(135deg, #1890ff, #34d8eb);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+    }
+    .seg {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.2;
+      margin-top: 16px;
+      color: #1367ab;
+    }
+    .detail {
+      font-size: 16px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    .result {
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      color: #1890ff;
+      font-family: "Segoe UI Semibold", "PingFang SC Semibold", "Microsoft YaHei Semibold", sans-serif;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 16px;
+      color: #243144;
+    }
+    .thead, .tfoot {
+      background: rgba(255, 255, 255, 0.12);
+      font-weight: 600;
+    }
+    th, td {
+      padding: 13px 14px;
+      border-radius: 14px;
+      text-align: center;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.16);
+    }
+    .result, th, td {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .diff {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .btns {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn.lg {
+      padding: 14px 16px;
+      font-size: 18px;
+      border-radius: 20px;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100px;
+      border-radius: 18px;
+      margin-top: 12px;
+      font-size: 24px;
+      color: white;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .green {
+      background: linear-gradient(135deg, #22c554, #38b2ac);
+    }
+    .red {
+      background: linear-gradient(135deg, #ff5648, #ff7a5c);
+    }
+    .progress {
+      width: 100%;
+      height: 14px;
+      border-radius: 14px;
+      margin-top: 8px;
+    }
+    .progress .bar {
+      height: 100%;
+      border-radius: 14px;
+      background: white;
+      will-change: width;
+    }
+    .fast, .slow {
+      display: none;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 8px;
+      color: white;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .fast {
+      background: linear-gradient(135deg, #22c554, #38b2ac);
+    }
+    .slow {
+      background: linear-gradient(135deg, #ff5648, #ff7a5c);
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>分段秒表</h1>
+    <div class="row">
+      <div class="input" id="time" placeholder="00:00.00"></div>
+      <div class="input" id="diff" placeholder="00:00.00"></div>
+    </div>
+    <div class="row">
+      <div class="input" id="speed" placeholder="0.00"></div>
+      <div class="input" id="result" placeholder="00:00.00"></div>
+    </div>
+    <div class="row" id="table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>圈数</th>
+            <th>时间</th>
+            <th>差值</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="result">暂无记录</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="btns">
+      <button class="btn lg" id="start">开始</button>
+      <button class="btn lg" id="pause">暂停</button>
+      <button class="btn lg" id="reset">清零</button>
+    </div>
+    <div class="detail" id="seg">当前圈速：00:00.00</div>
+    <div class="status" id="status">未开始</div>
+    <div class="fast" id="fast">最快段：00:00.00</div>
+    <div class="slow" id="slow">最慢段：00:00.00</div>
+    <div class="progress" id="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+  </main>
+  <script>
+    const startBtn = document.getElementById('start');
+    const pauseBtn = document.getElementById('pause');
+    const resetBtn = document.getElementById('reset');
+    const timeInput = document.getElementById('time');
+    const diffInput = document.getElementById('diff');
+    const speedInput = document.getElementById('speed');
+    const resultInput = document.getElementById('result');
+    const table = document.getElementById('table');
+    const tbody = document.getElementById('tbody');
+    const seg = document.getElementById('seg');
+    const status = document.getElementById('status');
+    const fast = document.getElementById('fast');
+    const slow = document.getElementById('slow');
+    const bar = document.getElementById('bar');
+    const progress = document.getElementById('progress');
+    const fastEl = document.getElementById('fast');
+    const slowEl = document.getElementById('slow');
+    let startTime = null;
+    let elapsedTime = 0;
+    let timerId = null;
+    let segment = 1;
+    let segments = [];
+    let currentDiff = null;
+    let fastTime = null;
+    let slowTime = null;
+
+    function updateDisplay() {
+      timeInput.value = formatTime(elapsedTime);
+      diffInput.value = formatTime(currentDiff);
+      speedInput.value = formatSpeed(elapsedTime / segment);
+      resultInput.value = formatTime(elapsedTime);
+      seg.textContent = `当前圈速：${formatTime(elapsedTime / segment)}`;
+      status.textContent = startTime ? '正在运行' : '未开始';
+      fastEl.style.display = elapsedTime < fastTime ? 'block' : 'none';
+      slowEl.style.display = elapsedTime > slowTime ? 'block' : 'none';
+      bar.style.width = `${elapsedTime / (fastTime || slowTime) * 100}%`;
+    }
+
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60000);
+      const seconds = Math.floor((time % 60000) / 1000);
+      const milliseconds = Math.floor((time % 1000) / 10);
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+    }
+
+    function formatSpeed(speed) {
+      const minutes = Math.floor(speed / 60000);
+      const seconds = Math.floor((speed % 60000) / 1000);
+      const milliseconds = Math.floor((speed % 1000) / 10);
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+    }
+
+    function start() {
+      if (!startTime) {
+        startTime = new Date();
+        timerId = setInterval(() => {
+          elapsedTime += 10;
+          updateDisplay();
+        }, 10);
+        updateDisplay();
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+      }
+    }
+
+    function pause() {
+      if (startTime) {
+        clearInterval(timerId);
+        startTime = null;
+        timerId = null;
+        updateDisplay();
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+      }
+    }
+
+    function reset() {
+      if (startTime) {
+        clearInterval(timerId);
+        startTime = null;
+        timerId = null;
+        elapsedTime = 0;
+        currentDiff = null;
+        fastTime = null;
+        slowTime = null;
+        updateDisplay();
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        resultInput.value = '00:00.00';
+        fastEl.style.display = 'none';
+        slowEl.style.display = 'none';
+        bar.style.width = '0%';
+      }
+      segments = [];
+      tbody.innerHTML = '';
+      table.classList.remove('result');
+      fastEl.style.display = 'none';
+      slowEl.style.display = 'none';
+      progress.style.width = '0%';
+      fastEl.textContent = '最快段：00:00.00';
+      slowEl.textContent = '最慢段：00:00.00';
+    }
+
+    function addSegment() {
+      if (startTime) {
+        const segmentTime = elapsedTime;
+        segments.push(segmentTime);
+        const lastSegmentTime = segments[segments.length - 2];
+        currentDiff = segmentTime - lastSegmentTime;
+        updateDisplay();
+        if (fastTime === null || segmentTime < fastTime) {
+          fastTime = segmentTime;
+          fastEl.textContent = formatTime(fastTime);
+        }
+        if (slowTime === null || segmentTime > slowTime) {
+          slowTime = segmentTime;
+          slowEl.textContent = formatTime(slowTime);
+        }
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${segment}</td>
+          <td>${formatTime(segmentTime)}</td>
+          <td>${formatTime(currentDiff)}</td>
+        `;
+        tbody.appendChild(row);
+        if (segments.length > 10) {
+          tbody.removeChild(tbody.firstChild);
+        }
+        table.classList.add('result');
+        segment++;
+      }
+    }
+
+    startBtn.addEventListener('click', start);
+    pauseBtn.addEventListener('click', pause);
+    resetBtn.addEventListener('click', reset);
+    timeInput.addEventListener('input', addSegment);
+  </script>
+</body>
+</html>

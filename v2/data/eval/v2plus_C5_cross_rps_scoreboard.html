@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>石头剪刀布对战</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #3949ab, #6c5ce7);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    p {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    .form {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .form label {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: start;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .form input,
+    .form textarea,
+    .form select {
+      width: 100%;
+      height: 44px;
+      border: 2px solid #dde4ee;
+      border-radius: 14px;
+      padding: 0 14px;
+      font-size: 16px;
+      background: #ffffff;
+    }
+    .form textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    .form button {
+      width: 100%;
+      height: 44px;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #3949ab, #6c5ce7);
+    }
+    .result {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 20px;
+      color: #34495e;
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+      width: 140px;
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 12px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .stat img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin-bottom: 4px;
+    }
+    .rounds {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+      width: 100%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+    .round {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      gap: 12px;
+      border-radius: 14px;
+      background: #ffffff;
+      margin-top: 8px;
+      scroll-snap-align: start;
+    }
+    .round img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+    .counter {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1;
+      margin-top: 8px;
+      color: #34495e;
+    }
+    .progress {
+      height: 14px;
+      background: #ffffff;
+      border-radius: 999px;
+      margin-top: 8px;
+    }
+    .progress .inner {
+      height: 100%;
+      background: linear-gradient(135deg, #3949ab, #6c5ce7);
+      border-radius: 999px;
+    }
+    .reset {
+      width: 100%;
+      height: 44px;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #3949ab, #6c5ce7);
+      margin-top: 12px;
+      text-align: center;
+    }
+    .reset:hover {
+      background: linear-gradient(135deg, #30415c, #475369);
+    }
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+      font-size: 20px;
+      color: #6b7280;
+    }
+    .icon + .icon {
+      margin-left: 12px;
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 4px;
+    }
+    .small p {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+    }
+    .small img {
+      width: 18px;
+      height: 18px;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>石头剪刀布对战</h1>
+    <p>点击“开始”按钮开始对战。</p>
+    <form id="gameForm">
+      <label>选择：</label>
+      <select name="choice">
+        <option value="石头">石头</option>
+        <option value="剪刀">剪刀</option>
+        <option value="布">布</option>
+      </select>
+      <button type="submit">开始</button>
+    </form>
+    <div class="result" id="result">请选择“开始”按钮开始对战。</div>
+    <div class="stats">
+      <div class="stat" id="meWins">我方：0胜0平</div>
+      <div class="stat" id="pcWins">电脑：0胜0平</div>
+    </div>
+    <div class="rounds" id="rounds"></div>
+    <button class="reset" id="reset">重置分数</button>
+  </div>
+  <script>
+    const choices = ["石头", "剪刀", "布"];
+    const resultEl = document.getElementById("result");
+    const meWinsEl = document.getElementById("meWins");
+    const pcWinsEl = document.getElementById("pcWins");
+    const roundsEl = document.getElementById("rounds");
+    const resetBtn = document.getElementById("reset");
+    let meWins = 0;
+    let pcWins = 0;
+    let rounds = 0;
+    let roundId = 1;
+    let pcChoice = "";
+    let meChoice = "";
+    resetBtn.addEventListener("click", resetGame);
+    function resetGame() {
+      meWins = 0;
+      pcWins = 0;
+      rounds = 0;
+      roundId = 1;
+      pcChoice = "";
+      meChoice = "";
+      meWinsEl.textContent = "我方：0胜0平";
+      pcWinsEl.textContent = "电脑：0胜0平";
+      roundsEl.innerHTML = "";
+      resultEl.textContent = "请选择“开始”按钮开始对战。";
+    }
+    document.getElementById("gameForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      meChoice = e.target.choice.value;
+      pcChoice = choices[Math.floor(Math.random() * choices.length)];
+      resultEl.textContent = `你：${meChoice}，电脑：${pcChoice}`;
+      if (meChoice === pcChoice) {
+        meWinsEl.textContent = "我方：${meWins}胜${meWins}平";
+        pcWinsEl.textContent = "电脑：${pcWins}胜${pcWins}平";
+      } else if ((meChoice === "石头" && pcChoice === "剪刀") ||
+                 (meChoice === "剪刀" && pcChoice === "布") ||
+                 (meChoice === "布" && pcChoice === "石头")) {
+        meWinsEl.textContent = "我方：${++meWins}胜${meWins}平";
+        pcWinsEl.textContent = "电脑：${pcWins}胜${pcWins}平";
+      } else {
+        pcWinsEl.textContent = "电脑：${++pcWins}胜${pcWins}平";
+        meWinsEl.textContent = "我方：${meWins}胜${meWins}平";
+      }
+      roundsEl.innerHTML += `
+        <div class="round" id="round${roundId}">
+          <img src="https://via.placeholder.com/80?text=${meChoice}" alt="${meChoice}">
+          <img src="https://via.placeholder.com/80?text=${pcChoice}" alt="${pcChoice}">
+          <div class="counter" id="round${roundId}Score">0/0</div>
+        </div>
+      `;
+      roundId++;
+    });
+  </script>
+</body>
+</html>

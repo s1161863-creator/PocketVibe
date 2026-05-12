@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>待办事项列表</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #4285f4, #6f42c1);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.2);
+      padding: 18px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 2px solid #dde4ee;
+      resize: vertical;
+    }
+    textarea {
+      min-height: 110px;
+      resize: column;
+    }
+    button {
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #4285f4, #6f42c1);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 12px;
+      transition: background 0.3s;
+    }
+    .checkmark {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
+    }
+    .list {
+      list-style: none;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 2px solid #dde4ee;
+    }
+    .item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-top: 8px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .label {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .delete {
+      font-size: 18px;
+      color: #6b7280;
+      transition: transform 0.3s;
+    }
+    .delete.open {
+      transform: translateY(-8px);
+    }
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 14px;
+    }
+    .links {
+      font-size: 14px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+      display: grid;
+      gap: 4px;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .small {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+      text-align: center;
+    }
+    .guide {
+      font-size: 12px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+      opacity: 0.7;
+    }
+    .copy {
+      font-size: 14px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+      display: grid;
+      gap: 4px;
+    }
+    .code {
+      font-size: 14px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+      display: grid;
+      gap: 4px;
+    }
+    .copy button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #4285f4, #6f42c1);
+      color: white;
+      margin-top: 8px;
+    }
+    .copy code {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #dde4ee;
+      border-radius: 999px;
+      background: white;
+      white-space: nowrap;
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>待办事项列表</h1>
+    <input id="todo" placeholder="输入待办事项" autocomplete="off">
+    <button onclick="addTodo()">添加</button>
+    <ul id="list" class="list"></ul>
+    <div class="footer">
+      <a href="https://github.com/hyf2019/mini-app-todo" target="_blank">GitHub</a>
+      <a href="https://hyf2019.github.io/mini-app-todo/" target="_blank">项目地址</a>
+    </div>
+  </main>
+  <script>
+    function addTodo() {
+      const todo = document.getElementById('todo').value.trim();
+      if (!todo) return;
+      const list = document.getElementById('list');
+      const item = document.createElement('li');
+      item.classList.add('item');
+      item.innerHTML = `
+        <input type="checkbox" id="check-${todo}">
+        <label for="check-${todo}" class="label">${todo}</label>
+        <button class="delete" onclick="deleteTodo(this)">删除</button>
+      `;
+      list.appendChild(item);
+      document.getElementById('todo').value = '';
+    }
+
+    function deleteTodo(button) {
+      const item = button.parentElement;
+      const list = item.parentElement;
+      list.removeChild(item);
+    }
+  </script>
+</body>
+</html>

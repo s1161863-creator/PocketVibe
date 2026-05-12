@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>井字棋</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #2b3856, #4c6188);
+    }
+    .game-container {
+      width: 100%;
+      max-width: 380px;
+      background: #18202f;
+      color: #f3f5f7;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .score-board {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #202a3a;
+    }
+    .score-count {
+      font-size: 24px;
+      font-weight: 700;
+      color: #e57249;
+      margin-right: 8px;
+    }
+    .player-score, .ai-score {
+      font-size: 18px;
+      color: #f3f5f7;
+      margin-right: 8px;
+    }
+    .result-message {
+      font-size: 16px;
+      color: #a6a6a6;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    button {
+      width: 100%;
+      font-size: 18px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .player-turn {
+      background: linear-gradient(135deg, #2b3856, #4c6188);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .ai-turn {
+      background: linear-gradient(135deg, #00b7ff, #005bea);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .reset-button {
+      background: linear-gradient(135deg, #e57249, #f57c00);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+    }
+    .square {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 38px;
+      font-weight: 900;
+      margin: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+    }
+    .player-square {
+      background: linear-gradient(135deg, #2b3856, #4c6188);
+      color: white;
+      transform: scale(1.05);
+    }
+    .ai-square {
+      background: linear-gradient(135deg, #00b7ff, #005bea);
+      color: white;
+      transform: scale(1.05);
+    }
+    .empty-square {
+      background: #202a3a;
+      color: #a6a6a6;
+      transform: scale(1.05);
+    }
+    .square:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.16);
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: #18202f;
+      color: #f3f5f7;
+      border-radius: 20px;
+      padding: 22px;
+      max-width: 380px;
+      text-align: center;
+      z-index: 1001;
+    }
+    .modal-content {
+      font-size: 16px;
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .reset-button {
+      background: linear-gradient(135deg, #e57249, #f57c00);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+    }
+    .result-message {
+      font-size: 18px;
+      color: #a6a6a6;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .player-score, .ai-score {
+      font-size: 14px;
+      color: #f3f5f7;
+      margin-right: 8px;
+    }
+    .reset-button {
+      background: linear-gradient(135deg, #e57249, #f57c00);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+    }
+    .score-board {
+      display: none;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #202a3a;
+    }
+    .player-turn {
+      background: linear-gradient(135deg, #2b3856, #4c6188);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+    }
+    .ai-turn {
+      background: linear-gradient(135deg, #00b7ff, #005bea);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+    }
+    .reset-button {
+      background: linear-gradient(135deg, #e57249, #f57c00);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+    }
+    .square {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 38px;
+      font-weight: 900;
+      margin: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+    }
+    .player-square {
+      background: linear-gradient(135deg, #2b3856, #4c6188);
+      color: white;
+      transform: scale(1.05);
+    }
+    .ai-square {
+      background: linear-gradient(135deg, #00b7ff, #005bea);
+      color: white;
+      transform: scale(1.05);
+    }
+    .empty-square {
+      background: #202a3a;
+      color: #a6a6a6;
+      transform: scale(1.05);
+    }
+    .square:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.16);
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: #18202f;
+      color: #f3f5f7;
+      border-radius: 20px;
+      padding: 22px;
+      max-width: 380px;
+      text-align: center;
+      z-index: 1001;
+    }
+    .modal-content {
+      font-size: 16px;
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .reset-button {
+      background: linear-gradient(135deg, #e57249, #f57c00);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+    }
+    .result-message {
+      font-size: 18px;
+      color: #a6a6a6;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .player-score, .ai-score {
+      font-size: 14px;
+      color: #f3f5f7;
+      margin-right: 8px;
+    }
+    .reset-button {
+      background: linear-gradient(135deg, #e57249, #f57c00);
+      color: white;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>井字棋</h1>
+    <div class="score-board">
+      <div class="player-score">0</div>
+      <div class="result-message">VS</div>
+      <div class="ai-score">0</div>
+    </div>
+    <div class="board">
+      <div class="square player-square" data-square="0"></div>
+      <div class="square player-square" data-square="1"></div>
+      <div class="square player-square" data-square="2"></div>
+      <div class="square player-square" data-square="3"></div>
+      <div class="square player-square" data-square="4"></div>
+      <div class="square player-square" data-square="5"></div>
+      <div class="square player-square" data-square="6"></div>
+      <div class="square player-square" data-square="7"></div>
+      <div class="square player-square" data-square="8"></div>
+    </div>
+    <button class="player-turn reset-button" data-action="reset">重置比分</button>
+  </div>
+
+  <script>
+    const board = document.querySelector('.board');
+    const squares = document.querySelectorAll('.square');
+    const playerTurnButton = document.querySelector('.player-turn');
+    const aiTurnButton = document.querySelector('.ai-turn');
+    const resetButton = document.querySelector('.reset-button');
+    const playerScore = document.querySelector('.player-score');
+    const aiScore = document.querySelector('.ai-score');
+    const resultMessage = document.querySelector('.result-message');
+    const overlay = document.querySelector('.overlay');
+    const modal = document.querySelector('.modal');
+    const modalContent = document.querySelector('.modal-content');
+    const buttonGroup = document.querySelector('.button-group');
+    let currentPlayer = 'player';
+    let playerWins = 0;
+    let aiWins = 0;
+    let draws = 0;
+
+    // 清空棋盘
+    function resetBoard() {
+      squares.forEach(square => {
+        square.classList.remove('player-square', 'ai-square', 'empty-square');
+        square.textContent = '';
+      });
+      currentPlayer = 'player';
+      playerTurnButton.classList.remove('ai-turn');
+      aiTurnButton.classList.remove('player-turn');
+      resultMessage.textContent = '';
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+
+    // 检查是否有人胜出
+    function checkWin() {
+      const winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // 行
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // 列
+        [0, 4, 8], [2, 4, 6] // 对角线
+      ];
+
+      for (const combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (squares[a].classList.contains('player-square') && squares[b].classList.contains('player-square') && squares[c].classList.contains('player-square')) {
+          playerWins++;
+          resultMessage.textContent = '你赢了！';
+          overlay.style.display = 'block';
+          modal.style.display = 'block';
+          return;
+        }
+        if (squares[a].classList.contains('ai-square') && squares[b].classList.contains('ai-square') && squares[c].classList.contains('ai-square')) {
+          aiWins++;
+          resultMessage.textContent = '电脑赢了！';
+          overlay.style.display = 'block';
+          modal.style.display = 'block';
+          return;
+        }
+      }
+
+      if (draws === 9) {
+        draws++;
+        resultMessage.textContent = '平局！';
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+        return;
+      }
+    }
+
+    // 处理玩家落子
+    function playerMove(square) {
+      if (square.classList.contains('player-square') || square.classList.contains('ai-square')) {
+        return;
+      }
+
+      square.classList.add('player-square');
+      square.textContent = 'X';
+      checkWin();
+      currentPlayer = 'ai';
+      aiTurnButton.classList.add('player-turn');
+      resultMessage.textContent = '';
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+
+    // 处理电脑落子
+    function aiMove() {
+      const emptySquares = Array.from(squares).filter(square => !square.classList.contains('player-square') && !square.classList.contains('ai-square'));
+      const randomIndex = Math.floor(Math.random() * emptySquares.length);
+      const selectedSquare = emptySquares[randomIndex];
+
+      selectedSquare.classList.add('ai-square');
+      selectedSquare.textContent = 'O';
+      checkWin();
+      currentPlayer = 'player';
+      playerTurnButton.classList.add('ai-turn');
+      resultMessage.textContent = '';
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+
+    // 处理重置比分
+    function resetScore() {
+      playerWins = 0;
+      aiWins = 0;
+      draws = 0;
+      playerScore.textContent = '0';
+      aiScore.textContent = '0';
+      resultMessage.textContent = '';
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+
+    // 添加事件监听器
+    squares.forEach(square => {
+      square.addEventListener('click', () => playerMove(square));
+    });
+
+    aiTurnButton.addEventListener('click', () => aiMove());
+    playerTurnButton.addEventListener('click', () => aiMove());
+    resetButton.addEventListener('click', resetScore);
+
+    // 初始化游戏
+    resetBoard();
+  </script>
+
+</body>
+</html>
