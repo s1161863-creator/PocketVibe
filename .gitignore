@@ -1,0 +1,97 @@
+# =============================================================================
+# PocketVibe — .gitignore
+# 目标：只保留"作业相关脚本 + 报告 + 小体积证据图"，排除训练产物和本地缓存
+# =============================================================================
+
+# --- Python 运行时产物 ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.ENV/
+
+# --- Jupyter / IDE ---
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- 训练 / 推理大文件（必须排除，否则仓库 > 1GB）---
+# LoRA adapter 会占几十 MB；完整 checkpoint 会占几 GB
+outputs/
+checkpoints/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+
+# HuggingFace / torch 缓存
+.cache/
+huggingface/
+transformers_cache/
+
+# SLURM 运行时日志
+logs/
+*.out
+*.err
+slurm-*.out
+
+# GPU 监控
+gpu_mem.csv
+
+# --- 大体积中间数据 ---
+# 保留 data/seed 和 data/eval 的 JSONL (人工可读、小)
+# 排除生成后的大批量中间产物
+data/raw/
+data/tmp/
+data/processed/**/*.arrow
+data/processed/**/*.parquet
+data/processed/cache/
+
+# --- 推理产物 HTML（除代表作之外）---
+# 如果数量 > 10 个，建议只保留 showcase 用的几个
+data/eval/generated_html/
+*.generated.html
+
+# --- 敏感信息 ---
+.env
+.env.local
+*.key
+*_api_key*
+config/secret*.yaml
+config/secret*.toml
+
+# --- 作业截图 ---
+# 注意：截图文件夹体积较大（~30-100 MB），默认全部跟踪
+# 如需排除，取消下行注释
+# 作业截图*/
+# evidence/*.jpg
+# evidence/*.png
+
+# --- 临时 / 杂项 ---
+*.log
+*.tmp
+*.bak
+*.~*
+~$*
+.pytest_cache/
+.mypy_cache/
+
+# --- 项目特有 ---
+# V1 遗留 sqlite 缓存
+*.sqlite
+*.db
+# 本地测试脚本（不进 repo）
+test_*.py
+!scripts/**/test_*.py          # 但脚本目录内的保留
