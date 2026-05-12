@@ -1,0 +1,1598 @@
+{
+  "base_model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "v1_adapter": "/home/student07/PocketVibe/outputs/qlora-run1/final_adapter",
+  "v2_adapter": "/home/student07/PocketVibe/outputs/qlora-v2-run1/final_adapter",
+  "sample_kwargs": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "do_sample": true,
+    "repetition_penalty": 1.0,
+    "max_new_tokens": 4096
+  },
+  "best_of_n": 3,
+  "note": "Offline finalize after interrupted job 1448/1455. C4_v2 and C5_v2 are MISSING and excluded from averages.",
+  "valid_case_count": 5,
+  "v1_avg": 89.0,
+  "v2_avg": 81.2,
+  "delta_avg": -7.799999999999997,
+  "v2_wins": 1,
+  "ties": 0,
+  "v1_wins": 4,
+  "missing": [],
+  "details": [
+    {
+      "tag": "C1_depth_stopwatch_lap",
+      "case": {
+        "tag": "C1_depth_stopwatch_lap",
+        "category": "DEPTH",
+        "difficulty": "high",
+        "instruction": "做一个分段秒表，要求：支持开始/暂停/清零三个操作；点击分段按钮可以记录当前圈速，最多保存10段；每段显示与上一段的差值；自动高亮最快段（绿色）和最慢段（红色）。",
+        "expected_features": [
+          [
+            "开始/暂停控制",
+            [
+              "start",
+              "pause",
+              "stop",
+              "开始",
+              "暂停",
+              "停止"
+            ]
+          ],
+          [
+            "分段 Lap 功能",
+            [
+              "lap",
+              "split",
+              "record",
+              "分段",
+              "记录",
+              "圈"
+            ]
+          ],
+          [
+            "清零功能",
+            [
+              "reset",
+              "clear",
+              "清零",
+              "重置"
+            ]
+          ],
+          [
+            "10 段上限",
+            [
+              ">=10",
+              "> 10",
+              ">10",
+              "length>=10",
+              "length > 10",
+              "length>10",
+              "slice(-10",
+              ".length === 10",
+              "max.{0,10}10"
+            ]
+          ],
+          [
+            "与上段差值",
+            [
+              "diff",
+              "delta",
+              "split",
+              "prev",
+              "last",
+              "差",
+              "-"
+            ]
+          ],
+          [
+            "最快段高亮",
+            [
+              "fastest",
+              "min",
+              "best",
+              "最快",
+              "green",
+              "#0f0",
+              "#43e97b"
+            ]
+          ],
+          [
+            "最慢段高亮",
+            [
+              "slowest",
+              "max",
+              "worst",
+              "最慢",
+              "red",
+              "#f00",
+              "#f5576c"
+            ]
+          ],
+          [
+            "时间格式化(分:秒)",
+            [
+              ":",
+              "padStart",
+              "toFixed",
+              "%60"
+            ]
+          ]
+        ]
+      },
+      "v1": {
+        "score": {
+          "total": 92,
+          "J_js_depth": 26,
+          "I_instruct": 22,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 4,
+              "state": 6,
+              "control": 6,
+              "funcs": 5,
+              "apis": 5
+            },
+            "I": {
+              "hit_count": 7,
+              "total": 8,
+              "hits": [
+                "开始/暂停控制",
+                "分段 Lap 功能",
+                "清零功能",
+                "与上段差值",
+                "最快段高亮",
+                "最慢段高亮",
+                "时间格式化(分:秒)"
+              ],
+              "missed": [
+                "10 段上限"
+              ]
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 14155
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C2_breadth_swim_timer",
+      "case": {
+        "tag": "C2_breadth_swim_timer",
+        "category": "BREADTH",
+        "difficulty": "high",
+        "instruction": "做一个游泳训练专用秒表，使用场景是湿手操作：字体要特别大（至少60px），按钮要特别大（至少80px高度），配色用防水风格的深蓝/浅蓝渐变，支持分段记录每一趟游泳的时间，显示总距离（按50米/趟估算）。",
+        "expected_features": [
+          [
+            "大字号时间显示",
+            [
+              "font-size:.*60",
+              "font-size:.*72",
+              "font-size:.*80",
+              "font-size:.*9",
+              "font-size:.*1[0-9][0-9]",
+              "3rem",
+              "4rem",
+              "5rem",
+              "6rem"
+            ]
+          ],
+          [
+            "大按钮",
+            [
+              "padding:.*2[0-9]",
+              "padding:.*3[0-9]",
+              "height:.*[6-9][0-9]",
+              "min-height",
+              "padding:16"
+            ]
+          ],
+          [
+            "深/浅蓝配色",
+            [
+              "#0",
+              "#1",
+              "#2",
+              "blue",
+              "navy",
+              "4facfe",
+              "00f2fe",
+              "667eea",
+              "2196"
+            ]
+          ],
+          [
+            "渐变背景",
+            [
+              "linear-gradient",
+              "radial-gradient",
+              "gradient"
+            ]
+          ],
+          [
+            "分段记录",
+            [
+              "lap",
+              "split",
+              "trip",
+              "分段",
+              "趟",
+              "lap"
+            ]
+          ],
+          [
+            "距离/米显示",
+            [
+              "50",
+              "米",
+              "meter",
+              "distance",
+              "total",
+              "distance"
+            ]
+          ],
+          [
+            "开始/暂停",
+            [
+              "start",
+              "pause",
+              "stop",
+              "开始",
+              "暂停"
+            ]
+          ]
+        ]
+      },
+      "v1": {
+        "score": {
+          "total": 80,
+          "J_js_depth": 15,
+          "I_instruct": 21,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 0,
+              "state": 6,
+              "control": 1,
+              "funcs": 3,
+              "apis": 5
+            },
+            "I": {
+              "hit_count": 6,
+              "total": 7,
+              "hits": [
+                "大按钮",
+                "深/浅蓝配色",
+                "渐变背景",
+                "分段记录",
+                "距离/米显示",
+                "开始/暂停"
+              ],
+              "missed": [
+                "大字号时间显示"
+              ]
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 5743
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C3_reasoning_calc_paren",
+      "case": {
+        "tag": "C3_reasoning_calc_paren",
+        "category": "REASONING",
+        "difficulty": "high",
+        "instruction": "做一个科学计算器：支持 + - × ÷ 括号四则运算，必须正确处理括号优先级和运算顺序；当表达式有语法错误（如括号不匹配/连续运算符）时，在结果区实时显示红色错误提示；支持回退键和清零键。",
+        "expected_features": [
+          [
+            "四则运算按钮",
+            [
+              "+",
+              "-",
+              "*",
+              "×",
+              "/",
+              "÷"
+            ]
+          ],
+          [
+            "括号按钮",
+            [
+              "(",
+              ")",
+              "\\("
+            ]
+          ],
+          [
+            "括号优先级求值",
+            [
+              "eval",
+              "Function",
+              "parse",
+              "precedence",
+              "stack",
+              "priority"
+            ]
+          ],
+          [
+            "实时错误检测",
+            [
+              "catch",
+              "try",
+              "error",
+              "invalid",
+              "错误",
+              "NaN",
+              "isNaN"
+            ]
+          ],
+          [
+            "错误红色提示",
+            [
+              "red",
+              "#f",
+              "color:red",
+              "color: red",
+              "error",
+              "错误"
+            ]
+          ],
+          [
+            "回退(backspace)",
+            [
+              "backspace",
+              "delete",
+              "pop",
+              "slice(0,-1)",
+              "⌫",
+              "退格"
+            ]
+          ],
+          [
+            "清零",
+            [
+              "clear",
+              "reset",
+              "AC",
+              "C",
+              "清零"
+            ]
+          ],
+          [
+            "数字显示区",
+            [
+              "display",
+              "screen",
+              "output",
+              "result",
+              "结果"
+            ]
+          ]
+        ]
+      },
+      "v1": {
+        "score": {
+          "total": 95,
+          "J_js_depth": 26,
+          "I_instruct": 25,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 8,
+              "state": 6,
+              "control": 6,
+              "funcs": 5,
+              "apis": 1
+            },
+            "I": {
+              "hit_count": 8,
+              "total": 8,
+              "hits": [
+                "四则运算按钮",
+                "括号按钮",
+                "括号优先级求值",
+                "实时错误检测",
+                "错误红色提示",
+                "回退(backspace)",
+                "清零",
+                "数字显示区"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 13255
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C4_combination_todo_pomodoro",
+      "case": {
+        "tag": "C4_combination_todo_pomodoro",
+        "category": "COMBINATION",
+        "difficulty": "high",
+        "instruction": "做一个融合待办事项和番茄钟的工具：上半部分是待办列表，可以添加/勾选/删除任务；点击任意待办项旁边的▶按钮，下半部分的番茄钟就自动以该任务名启动25分钟倒计时；倒计时结束后自动把对应待办标记为完成。",
+        "expected_features": [
+          [
+            "添加待办",
+            [
+              "add",
+              "push",
+              "新增",
+              "添加",
+              "onclick"
+            ]
+          ],
+          [
+            "勾选待办",
+            [
+              "check",
+              "done",
+              "toggle",
+              "completed",
+              "勾选",
+              "☑",
+              "✅"
+            ]
+          ],
+          [
+            "删除待办",
+            [
+              "remove",
+              "splice",
+              "delete",
+              "删除",
+              "×"
+            ]
+          ],
+          [
+            "启动按钮",
+            [
+              "▶",
+              "start",
+              "play",
+              "启动",
+              "开始"
+            ]
+          ],
+          [
+            "25分钟倒计时",
+            [
+              "25",
+              "1500",
+              "60*25",
+              "25*60"
+            ]
+          ],
+          [
+            "计时器逻辑",
+            [
+              "setInterval",
+              "setTimeout",
+              "Date",
+              "--",
+              "countdown"
+            ]
+          ],
+          [
+            "当前任务显示",
+            [
+              "current",
+              "active",
+              "当前",
+              "正在"
+            ]
+          ],
+          [
+            "结束自动标记",
+            [
+              "complete",
+              "done",
+              "auto",
+              "mark",
+              "完成",
+              "自动"
+            ]
+          ],
+          [
+            "显示时间",
+            [
+              "padStart",
+              ":",
+              "toFixed",
+              "format"
+            ]
+          ]
+        ]
+      },
+      "v1": {
+        "score": {
+          "total": 96,
+          "J_js_depth": 27,
+          "I_instruct": 25,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 8,
+              "state": 6,
+              "control": 5,
+              "funcs": 5,
+              "apis": 3
+            },
+            "I": {
+              "hit_count": 9,
+              "total": 9,
+              "hits": [
+                "添加待办",
+                "勾选待办",
+                "删除待办",
+                "启动按钮",
+                "25分钟倒计时",
+                "计时器逻辑",
+                "当前任务显示",
+                "结束自动标记",
+                "显示时间"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 8164
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C5_cross_rps_scoreboard",
+      "case": {
+        "tag": "C5_cross_rps_scoreboard",
+        "category": "CROSS_CATEGORY",
+        "difficulty": "high",
+        "instruction": "做一个石头剪刀布对战工具，但带实时记分板：用户选择石头/剪刀/布后，电脑随机出招，显示本轮胜负；同时顶部记分板实时更新我方/电脑的累计胜场和平局次数；支持一键重置分数；最近5局结果用小图标滚动显示。",
+        "expected_features": [
+          [
+            "三选一按钮",
+            [
+              "石头",
+              "剪刀",
+              "布",
+              "rock",
+              "paper",
+              "scissors",
+              "✊",
+              "✋",
+              "✌"
+            ]
+          ],
+          [
+            "电脑随机出招",
+            [
+              "Math.random",
+              "random",
+              "floor"
+            ]
+          ],
+          [
+            "胜负判定",
+            [
+              "win",
+              "lose",
+              "draw",
+              "胜",
+              "负",
+              "平"
+            ]
+          ],
+          [
+            "我方分数",
+            [
+              "my",
+              "player",
+              "user",
+              "我方",
+              "player"
+            ]
+          ],
+          [
+            "电脑分数",
+            [
+              "ai",
+              "cpu",
+              "computer",
+              "电脑",
+              "bot"
+            ]
+          ],
+          [
+            "平局统计",
+            [
+              "draw",
+              "tie",
+              "平局",
+              "平"
+            ]
+          ],
+          [
+            "重置分数",
+            [
+              "reset",
+              "clear",
+              "重置",
+              "清零"
+            ]
+          ],
+          [
+            "最近5局历史",
+            [
+              "history",
+              "recent",
+              "last",
+              "5",
+              "slice(-5",
+              "历史",
+              "最近"
+            ]
+          ],
+          [
+            "动态更新 DOM",
+            [
+              "textContent",
+              "innerHTML",
+              "innerText",
+              "appendChild"
+            ]
+          ]
+        ]
+      },
+      "v1": {
+        "score": {
+          "total": 82,
+          "J_js_depth": 16,
+          "I_instruct": 22,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 0,
+              "state": 6,
+              "control": 5,
+              "funcs": 5,
+              "apis": 0
+            },
+            "I": {
+              "hit_count": 8,
+              "total": 9,
+              "hits": [
+                "三选一按钮",
+                "胜负判定",
+                "我方分数",
+                "电脑分数",
+                "平局统计",
+                "重置分数",
+                "最近5局历史",
+                "动态更新 DOM"
+              ],
+              "missed": [
+                "电脑随机出招"
+              ]
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 7588
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C1_depth_stopwatch_lap",
+      "case": {
+        "tag": "C1_depth_stopwatch_lap",
+        "category": "DEPTH",
+        "difficulty": "high",
+        "instruction": "做一个分段秒表，要求：支持开始/暂停/清零三个操作；点击分段按钮可以记录当前圈速，最多保存10段；每段显示与上一段的差值；自动高亮最快段（绿色）和最慢段（红色）。",
+        "expected_features": [
+          [
+            "开始/暂停控制",
+            [
+              "start",
+              "pause",
+              "stop",
+              "开始",
+              "暂停",
+              "停止"
+            ]
+          ],
+          [
+            "分段 Lap 功能",
+            [
+              "lap",
+              "split",
+              "record",
+              "分段",
+              "记录",
+              "圈"
+            ]
+          ],
+          [
+            "清零功能",
+            [
+              "reset",
+              "clear",
+              "清零",
+              "重置"
+            ]
+          ],
+          [
+            "10 段上限",
+            [
+              ">=10",
+              "> 10",
+              ">10",
+              "length>=10",
+              "length > 10",
+              "length>10",
+              "slice(-10",
+              ".length === 10",
+              "max.{0,10}10"
+            ]
+          ],
+          [
+            "与上段差值",
+            [
+              "diff",
+              "delta",
+              "split",
+              "prev",
+              "last",
+              "差",
+              "-"
+            ]
+          ],
+          [
+            "最快段高亮",
+            [
+              "fastest",
+              "min",
+              "best",
+              "最快",
+              "green",
+              "#0f0",
+              "#43e97b"
+            ]
+          ],
+          [
+            "最慢段高亮",
+            [
+              "slowest",
+              "max",
+              "worst",
+              "最慢",
+              "red",
+              "#f00",
+              "#f5576c"
+            ]
+          ],
+          [
+            "时间格式化(分:秒)",
+            [
+              ":",
+              "padStart",
+              "toFixed",
+              "%60"
+            ]
+          ]
+        ]
+      },
+      "v2": {
+        "score": {
+          "total": 91,
+          "J_js_depth": 22,
+          "I_instruct": 25,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 0,
+              "state": 6,
+              "control": 6,
+              "funcs": 5,
+              "apis": 5
+            },
+            "I": {
+              "hit_count": 8,
+              "total": 8,
+              "hits": [
+                "开始/暂停控制",
+                "分段 Lap 功能",
+                "清零功能",
+                "10 段上限",
+                "与上段差值",
+                "最快段高亮",
+                "最慢段高亮",
+                "时间格式化(分:秒)"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 9082
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C2_breadth_swim_timer",
+      "case": {
+        "tag": "C2_breadth_swim_timer",
+        "category": "BREADTH",
+        "difficulty": "high",
+        "instruction": "做一个游泳训练专用秒表，使用场景是湿手操作：字体要特别大（至少60px），按钮要特别大（至少80px高度），配色用防水风格的深蓝/浅蓝渐变，支持分段记录每一趟游泳的时间，显示总距离（按50米/趟估算）。",
+        "expected_features": [
+          [
+            "大字号时间显示",
+            [
+              "font-size:.*60",
+              "font-size:.*72",
+              "font-size:.*80",
+              "font-size:.*9",
+              "font-size:.*1[0-9][0-9]",
+              "3rem",
+              "4rem",
+              "5rem",
+              "6rem"
+            ]
+          ],
+          [
+            "大按钮",
+            [
+              "padding:.*2[0-9]",
+              "padding:.*3[0-9]",
+              "height:.*[6-9][0-9]",
+              "min-height",
+              "padding:16"
+            ]
+          ],
+          [
+            "深/浅蓝配色",
+            [
+              "#0",
+              "#1",
+              "#2",
+              "blue",
+              "navy",
+              "4facfe",
+              "00f2fe",
+              "667eea",
+              "2196"
+            ]
+          ],
+          [
+            "渐变背景",
+            [
+              "linear-gradient",
+              "radial-gradient",
+              "gradient"
+            ]
+          ],
+          [
+            "分段记录",
+            [
+              "lap",
+              "split",
+              "trip",
+              "分段",
+              "趟",
+              "lap"
+            ]
+          ],
+          [
+            "距离/米显示",
+            [
+              "50",
+              "米",
+              "meter",
+              "distance",
+              "total",
+              "distance"
+            ]
+          ],
+          [
+            "开始/暂停",
+            [
+              "start",
+              "pause",
+              "stop",
+              "开始",
+              "暂停"
+            ]
+          ]
+        ]
+      },
+      "v2": {
+        "score": {
+          "total": 56,
+          "J_js_depth": 0,
+          "I_instruct": 25,
+          "F_functional": 7,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 0,
+              "state": 0,
+              "control": 0,
+              "funcs": 0,
+              "apis": 0
+            },
+            "I": {
+              "hit_count": 7,
+              "total": 7,
+              "hits": [
+                "大字号时间显示",
+                "大按钮",
+                "深/浅蓝配色",
+                "渐变背景",
+                "分段记录",
+                "距离/米显示",
+                "开始/暂停"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 0,
+              "script_balance": 0,
+              "style_balance": 2,
+              "brace_balance": 0,
+              "paren_balance": 0,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 13141
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C3_reasoning_calc_paren",
+      "case": {
+        "tag": "C3_reasoning_calc_paren",
+        "category": "REASONING",
+        "difficulty": "high",
+        "instruction": "做一个科学计算器：支持 + - × ÷ 括号四则运算，必须正确处理括号优先级和运算顺序；当表达式有语法错误（如括号不匹配/连续运算符）时，在结果区实时显示红色错误提示；支持回退键和清零键。",
+        "expected_features": [
+          [
+            "四则运算按钮",
+            [
+              "+",
+              "-",
+              "*",
+              "×",
+              "/",
+              "÷"
+            ]
+          ],
+          [
+            "括号按钮",
+            [
+              "(",
+              ")",
+              "\\("
+            ]
+          ],
+          [
+            "括号优先级求值",
+            [
+              "eval",
+              "Function",
+              "parse",
+              "precedence",
+              "stack",
+              "priority"
+            ]
+          ],
+          [
+            "实时错误检测",
+            [
+              "catch",
+              "try",
+              "error",
+              "invalid",
+              "错误",
+              "NaN",
+              "isNaN"
+            ]
+          ],
+          [
+            "错误红色提示",
+            [
+              "red",
+              "#f",
+              "color:red",
+              "color: red",
+              "error",
+              "错误"
+            ]
+          ],
+          [
+            "回退(backspace)",
+            [
+              "backspace",
+              "delete",
+              "pop",
+              "slice(0,-1)",
+              "⌫",
+              "退格"
+            ]
+          ],
+          [
+            "清零",
+            [
+              "clear",
+              "reset",
+              "AC",
+              "C",
+              "清零"
+            ]
+          ],
+          [
+            "数字显示区",
+            [
+              "display",
+              "screen",
+              "output",
+              "result",
+              "结果"
+            ]
+          ]
+        ]
+      },
+      "v2": {
+        "score": {
+          "total": 83,
+          "J_js_depth": 14,
+          "I_instruct": 25,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 0,
+              "state": 5,
+              "control": 4,
+              "funcs": 5,
+              "apis": 0
+            },
+            "I": {
+              "hit_count": 8,
+              "total": 8,
+              "hits": [
+                "四则运算按钮",
+                "括号按钮",
+                "括号优先级求值",
+                "实时错误检测",
+                "错误红色提示",
+                "回退(backspace)",
+                "清零",
+                "数字显示区"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 4367
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C4_combination_todo_pomodoro",
+      "case": {
+        "tag": "C4_combination_todo_pomodoro",
+        "category": "COMBINATION",
+        "difficulty": "high",
+        "instruction": "做一个融合待办事项和番茄钟的工具：上半部分是待办列表，可以添加/勾选/删除任务；点击任意待办项旁边的▶按钮，下半部分的番茄钟就自动以该任务名启动25分钟倒计时；倒计时结束后自动把对应待办标记为完成。",
+        "expected_features": [
+          [
+            "添加待办",
+            [
+              "add",
+              "push",
+              "新增",
+              "添加",
+              "onclick"
+            ]
+          ],
+          [
+            "勾选待办",
+            [
+              "check",
+              "done",
+              "toggle",
+              "completed",
+              "勾选",
+              "☑",
+              "✅"
+            ]
+          ],
+          [
+            "删除待办",
+            [
+              "remove",
+              "splice",
+              "delete",
+              "删除",
+              "×"
+            ]
+          ],
+          [
+            "启动按钮",
+            [
+              "▶",
+              "start",
+              "play",
+              "启动",
+              "开始"
+            ]
+          ],
+          [
+            "25分钟倒计时",
+            [
+              "25",
+              "1500",
+              "60*25",
+              "25*60"
+            ]
+          ],
+          [
+            "计时器逻辑",
+            [
+              "setInterval",
+              "setTimeout",
+              "Date",
+              "--",
+              "countdown"
+            ]
+          ],
+          [
+            "当前任务显示",
+            [
+              "current",
+              "active",
+              "当前",
+              "正在"
+            ]
+          ],
+          [
+            "结束自动标记",
+            [
+              "complete",
+              "done",
+              "auto",
+              "mark",
+              "完成",
+              "自动"
+            ]
+          ],
+          [
+            "显示时间",
+            [
+              "padStart",
+              ":",
+              "toFixed",
+              "format"
+            ]
+          ]
+        ]
+      },
+      "v2": {
+        "score": {
+          "total": 93,
+          "J_js_depth": 24,
+          "I_instruct": 25,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 2,
+              "state": 6,
+              "control": 6,
+              "funcs": 5,
+              "apis": 5
+            },
+            "I": {
+              "hit_count": 9,
+              "total": 9,
+              "hits": [
+                "添加待办",
+                "勾选待办",
+                "删除待办",
+                "启动按钮",
+                "25分钟倒计时",
+                "计时器逻辑",
+                "当前任务显示",
+                "结束自动标记",
+                "显示时间"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 8665
+        },
+        "present": true
+      }
+    },
+    {
+      "tag": "C5_cross_rps_scoreboard",
+      "case": {
+        "tag": "C5_cross_rps_scoreboard",
+        "category": "CROSS_CATEGORY",
+        "difficulty": "high",
+        "instruction": "做一个石头剪刀布对战工具，但带实时记分板：用户选择石头/剪刀/布后，电脑随机出招，显示本轮胜负；同时顶部记分板实时更新我方/电脑的累计胜场和平局次数；支持一键重置分数；最近5局结果用小图标滚动显示。",
+        "expected_features": [
+          [
+            "三选一按钮",
+            [
+              "石头",
+              "剪刀",
+              "布",
+              "rock",
+              "paper",
+              "scissors",
+              "✊",
+              "✋",
+              "✌"
+            ]
+          ],
+          [
+            "电脑随机出招",
+            [
+              "Math.random",
+              "random",
+              "floor"
+            ]
+          ],
+          [
+            "胜负判定",
+            [
+              "win",
+              "lose",
+              "draw",
+              "胜",
+              "负",
+              "平"
+            ]
+          ],
+          [
+            "我方分数",
+            [
+              "my",
+              "player",
+              "user",
+              "我方",
+              "player"
+            ]
+          ],
+          [
+            "电脑分数",
+            [
+              "ai",
+              "cpu",
+              "computer",
+              "电脑",
+              "bot"
+            ]
+          ],
+          [
+            "平局统计",
+            [
+              "draw",
+              "tie",
+              "平局",
+              "平"
+            ]
+          ],
+          [
+            "重置分数",
+            [
+              "reset",
+              "clear",
+              "重置",
+              "清零"
+            ]
+          ],
+          [
+            "最近5局历史",
+            [
+              "history",
+              "recent",
+              "last",
+              "5",
+              "slice(-5",
+              "历史",
+              "最近"
+            ]
+          ],
+          [
+            "动态更新 DOM",
+            [
+              "textContent",
+              "innerHTML",
+              "innerText",
+              "appendChild"
+            ]
+          ]
+        ]
+      },
+      "v2": {
+        "score": {
+          "total": 83,
+          "J_js_depth": 14,
+          "I_instruct": 25,
+          "F_functional": 20,
+          "C_css": 14,
+          "S_structure": 10,
+          "breakdown": {
+            "J": {
+              "events": 0,
+              "state": 6,
+              "control": 4,
+              "funcs": 2,
+              "apis": 2
+            },
+            "I": {
+              "hit_count": 9,
+              "total": 9,
+              "hits": [
+                "三选一按钮",
+                "电脑随机出招",
+                "胜负判定",
+                "我方分数",
+                "电脑分数",
+                "平局统计",
+                "重置分数",
+                "最近5局历史",
+                "动态更新 DOM"
+              ],
+              "missed": []
+            },
+            "F": {
+              "doctype": 3,
+              "html_close": 3,
+              "script_balance": 3,
+              "style_balance": 2,
+              "brace_balance": 4,
+              "paren_balance": 3,
+              "no_dangling_tail": 2
+            },
+            "C": {
+              "viewport": 3,
+              "mobile": 2,
+              "modern_ui": 3,
+              "colors": 3,
+              "no_cdn": 3
+            },
+            "S": {
+              "html_lang": 2,
+              "meta_charset": 2,
+              "has_title": 2,
+              "head_body": 2,
+              "length_ok": 2
+            }
+          },
+          "length": 8416
+        },
+        "present": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>分段秒表</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.18);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    p {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 12px 14px;
+      background: #ffffff;
+      color: #243143;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+      color: #6b7280;
+    }
+    .detail {
+      font-size: 16px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      color: #6b7280;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      color: #243143;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+    .label {
+      font-weight: 700;
+      min-width: 120px;
+    }
+    .value {
+      flex: 1;
+      color: #6b7280;
+    }
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 24px;
+      border-radius: 14px;
+      background: #ffffff;
+      border: 2px solid #dde4ee;
+      margin-top: 8px;
+    }
+    .track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: #ffffff;
+      transform-origin: center;
+      transition: transform 0.3s;
+    }
+    .active {
+      transform: translateX(100%);
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .control {
+      font-size: 16px;
+      margin: 0 8px;
+      cursor: pointer;
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .progress {
+      --c: #243143;
+      --w: 4px;
+      --h: 14px;
+      --a: 0.24;
+      position: relative;
+      width: 100%;
+      height: 10px;
+      border-radius: 10px;
+      background: hsl(var(--c), 80%, 60%);
+      margin-top: 8px;
+    }
+    .bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, hsl(var(--c), 80%, 70%), hsl(var(--c), 80%, 60%));
+    }
+    .highlight {
+      --c: #fff;
+      --w: 4px;
+      --h: 14px;
+      --a: 0.32;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      background: hsl(var(--c), 80%, 90%);
+      transform-origin: center;
+      transform: scale(var(--a));
+      transition: transform 0.3s;
+    }
+    .highlight .bar {
+      background: linear-gradient(90deg, hsl(var(--c), 80%, 95%), hsl(var(--c), 80%, 90%));
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>分段秒表</h1>
+    <p>点击分段按钮可以记录当前圈速，最多保存10段。</p>
+    <input type="number" id="interval" placeholder="间隔（秒）" value="1" min="1">
+    <button onclick="start()">开始</button>
+    <button onclick="pause()">暂停</button>
+    <button onclick="reset()">清零</button>
+    <p id="result" class="result"></p>
+    <p id="detail" class="detail"></p>
+    <div class="stats">
+      <div class="item">
+        <label for="segment">分段</label>
+        <select id="segment" onchange="updateSegment()">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+      <div class="item">
+        <label for="speed">圈速</label>
+        <input type="number" id="speed" disabled value="0" min="0">
+      </div>
+      <div class="item">
+        <label for="diff">差值</label>
+        <input type="number" id="diff" disabled value="0" min="0">
+      </div>
+    </div>
+    <div class="progress" onclick="toggleHighlight()">
+      <div class="track"></div>
+      <div class="bar"></div>
+      <div class="highlight">
+        <div class="bar"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="toggleHighlight()" class="small">高亮</button>
+      <button onclick="reset()">重置</button>
+    </div>
+  </div>
+  <script>
+    let interval = 1;
+    let startAt = null;
+    let segments = [];
+    let highlight = false;
+    let speed = 0;
+    let diff = 0;
+    let currentSegment = 1;
+
+    function start() {
+      if (startAt) return;
+      startAt = new Date();
+      intervalId = setInterval(() => {
+        const now = new Date();
+        const elapsed = now - startAt;
+        const remaining = interval * segments.length - elapsed;
+        const speed = Math.floor(elapsed / interval);
+        const diff = Math.floor((speed - segments[segments.length - 1]) * 100) / 100;
+        if (currentSegment < segments.length) {
+          const segment = segments[currentSegment];
+          const segmentSpeed = Math.floor(segment / interval);
+          const segmentDiff = Math.floor((segmentSpeed - segment) * 100) / 100;
+          document.getElementById('speed').value = segmentSpeed;
+          document.getElementById('diff').value = segmentDiff;
+        } else {
+          document.getElementById('speed').value = speed;
+          document.getElementById('diff').value = diff;
+        }
+        if (remaining <= 0) {
+          clearInterval(intervalId);
+          currentSegment++;
+          if (currentSegment > segments.length) {
+            currentSegment = 1;
+            segments = [];
+          }
+          updateSegment();
+          updateResult();
+          startAt = null;
+        }
+      }, 1000);
+    }
+
+    function pause() {
+      if (!startAt) return;
+      clearInterval(intervalId);
+      startAt = null;
+    }
+
+    function reset() {
+      clearInterval(intervalId);
+      startAt = null;
+      segments = [];
+      currentSegment = 1;
+      updateSegment();
+      updateResult();
+      updateSpeed();
+      updateDiff();
+      document.getElementById('highlight').classList.remove('active');
+      document.getElementById('speed').value = 0;
+      document.getElementById('diff').value = 0;
+      document.getElementById('result').textContent = '00:00.00';
+      document.getElementById('detail').textContent = '';
+    }
+
+    function toggleHighlight() {
+      if (highlight) {
+        document.getElementById('highlight').classList.remove('active');
+      } else {
+        document.getElementById('highlight').classList.add('active');
+      }
+      highlight = !highlight;
+    }
+
+    function updateSegment() {
+      document.getElementById('segment').value = currentSegment;
+    }
+
+    function updateResult() {
+      const time = Math.floor((interval * segments.length - (new Date() - startAt)) / 1000);
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60);
+      const milliseconds = Math.floor((time % 1) * 1000);
+      document.getElementById('result').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+    }
+
+    function updateSpeed() {
+      if (segments.length === 0) return;
+      document.getElementById('speed').value = Math.floor(segments[segments.length - 1] / interval);
+    }
+
+    function updateDiff() {
+      if (segments.length < 2) return;
+      document.getElementById('diff').value = Math.floor((segments[segments.length - 1] - segments[segments.length - 2]) / interval);
+    }
+  </script>
+</body>
+</html>

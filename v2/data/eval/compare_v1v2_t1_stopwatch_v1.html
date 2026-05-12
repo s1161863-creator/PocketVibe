@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>秒表</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #ff9966, #ff5e62);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      color: #243147;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p.sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243147;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #ff9966, #ff5e62);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+    }
+    .chips {
+      display: none;
+    }
+    .panel {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: white;
+      border: 2px solid #dde4ee;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .primary {
+      flex: 1;
+      background: linear-gradient(135deg, #ff9966, #ff5e62);
+      color: white;
+    }
+    .secondary {
+      background: #f6f8fa;
+      color: #5c6bc0;
+    }
+    button.primary {
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    button.secondary {
+      font-size: 14px;
+      padding: 12px 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>秒表</h1>
+    <p class="sub">开始、停止、清零</p>
+    <input
+      type="text"
+      placeholder="请输入开始时间"
+      name="start-time"
+      value="00:00:00"
+      readonly
+    />
+    <div class="row">
+      <input
+        type="text"
+        placeholder="请输入结束时间"
+        name="end-time"
+        value="00:00:00"
+        readonly
+      />
+      <button class="primary" onclick="start()">开始</button>
+    </div>
+    <div class="row">
+      <input
+        type="text"
+        placeholder="请输入总时间"
+        name="total-time"
+        value="00:00:00"
+        readonly
+      />
+      <button class="secondary" onclick="stop()">停止</button>
+    </div>
+    <div class="row">
+      <button class="secondary" onclick="reset()">清零</button>
+    </div>
+    <div class="panel">
+      <div class="result">00:00:00</div>
+      <div class="small">总时间：00:00:00</div>
+    </div>
+    <div class="btn-row">
+      <button class="secondary" onclick="copy()">复制</button>
+      <button class="secondary" onclick="copyTotal()">复制总时间</button>
+    </div>
+  </div>
+  <script>
+    let startTime = null;
+    let endTime = null;
+    let totalTime = null;
+    let intervalId = null;
+    let isRunning = false;
+
+    function start() {
+      if (isRunning) return;
+      isRunning = true;
+      startTime = new Date().getTime();
+      intervalId = setInterval(updateTime, 10);
+    }
+
+    function stop() {
+      if (!isRunning) return;
+      isRunning = false;
+      endTime = new Date().getTime();
+      clearInterval(intervalId);
+      calculateTotalTime();
+    }
+
+    function reset() {
+      startTime = null;
+      endTime = null;
+      totalTime = null;
+      isRunning = false;
+      updateResult("00:00:00");
+      updateTotalResult("00:00:00");
+      updatePanelChips();
+      updatePanelResult();
+    }
+
+    function updateTime() {
+      const currentTime = new Date().getTime();
+      const elapsedTime = currentTime - startTime;
+      const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+      const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      updateResult(formattedTime);
+    }
+
+    function calculateTotalTime() {
+      if (!startTime || !endTime) return;
+      const totalElapsed = endTime - startTime;
+      const totalHours = Math.floor(totalElapsed / (1000 * 60 * 60));
+      const totalMinutes = Math.floor((totalElapsed % (1000 * 60 * 60)) / (1000 * 60));
+      const totalSeconds = Math.floor((totalElapsed % (1000 * 60)) / 1000);
+      const formattedTotalTime = `${totalHours.toString().padStart(2, "0")}:${totalMinutes.toString().padStart(2, "0")}:${totalSeconds.toString().padStart(2, "0")}`;
+      updateTotalResult(formattedTotalTime);
+    }
+
+    function updateResult(time) {
+      document.querySelector('input[name="start-time"]').value = time;
+      document.querySelector('input[name="end-time"]').value = time;
+      document.querySelector('input[name="total-time"]').value = time;
+      updatePanelResult();
+    }
+
+    function updateTotalResult(time) {
+      document.querySelector('input[name="total-time"]').value = time;
+      updatePanelResult();
+    }
+
+    function updatePanelResult() {
+      const result = document.querySelector('.result');
+      result.textContent = document.querySelector('input[name="start-time"]').value;
+    }
+
+    function updatePanelChips() {
+      const chips = document.querySelector('.chips');
+      chips.innerHTML = "";
+      if (isRunning) {
+        chips.innerHTML += '<span class="chip">开始</span>';
+      }
+      if (endTime) {
+        chips.innerHTML += '<span class="chip">停止</span>';
+      }
+      if (totalTime) {
+        chips.innerHTML += '<span class="chip">总时间</span>';
+      }
+    }
+
+    function copy() {
+      const result = document.querySelector('.result');
+      navigator.clipboard.writeText(result.textContent);
+    }
+
+    function copyTotal() {
+      const totalResult = document.querySelector('input[name="total-time"]');
+      navigator.clipboard.writeText(totalResult.textContent);
+    }
+  </script>
+</body>
+</html>

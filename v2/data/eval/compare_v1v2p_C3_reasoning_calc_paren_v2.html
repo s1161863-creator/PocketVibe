@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>科学计算器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #448aff, #8814d7);
+    }
+    .calculator {
+      width: 100%;
+      max-width: 320px;
+      background: #222;
+      border-radius: 18px;
+      overflow: hidden;
+      padding: 28px;
+    }
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+    input {
+      width: 100%;
+      height: 60px;
+      font-size: 24px;
+      border: none;
+      border-radius: 18px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.16);
+      padding: 0 14px;
+    }
+    .result {
+      font-size: 48px;
+      text-align: right;
+      margin-bottom: 12px;
+      color: #fff;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    button {
+      width: 100%;
+      height: 56px;
+      font-size: 20px;
+      border: none;
+      border-radius: 18px;
+      color: #222;
+      padding: 0 14px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.16);
+    }
+    .num {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .opr {
+      background: rgba(255, 255, 255, 0.16);
+      font-weight: 700;
+    }
+    .clr, .back {
+      background: rgba(255, 255, 255, 0.12);
+      padding-right: 12px;
+    }
+    .back {
+      padding-right: 0;
+    }
+    .res {
+      background: rgba(255, 255, 255, 0.16);
+      padding-top: 12px;
+    }
+    .err {
+      background: rgba(255, 0, 0, 0.16);
+      color: #fff;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h1>科学计算器</h1>
+    <input id="display" disabled readonly />
+    <div class="row">
+      <button class="opr clr" onclick="clearDisplay()">C</button>
+      <button class="opr back" onclick="backspace()">←</button>
+      <button class="opr" onclick="append('7')">7</button>
+      <button class="opr" onclick="append('8')">8</button>
+      <button class="opr" onclick="append('9')">9</button>
+      <button class="opr" onclick="append('*')">×</button>
+    </div>
+    <div class="row">
+      <button class="opr clr" onclick="clearDisplay()">CE</button>
+      <button class="opr" onclick="append('4')">4</button>
+      <button class="opr" onclick="append('5')">5</button>
+      <button class="opr" onclick="append('6')">6</button>
+      <button class="opr" onclick="append('-')">-</button>
+    </div>
+    <div class="row">
+      <button class="opr clr" onclick="clearDisplay()">±</button>
+      <button class="opr" onclick="append('1')">1</button>
+      <button class="opr" onclick="append('2')">2</button>
+      <button class="opr" onclick="append('3')">3</button>
+      <button class="opr" onclick="append('+')">+</button>
+    </div>
+    <div class="row res">
+      <button class="num" id="result" onclick="updateDisplay()">0</button>
+      <button class="opr" onclick="append('.')">.</button>
+      <button class="opr" onclick="calculate()">＝</button>
+    </div>
+  </div>
+  <script>
+    let display = document.getElementById('display');
+    let result = document.getElementById('result');
+    let input = '';
+    let stack = [];
+    let err = false;
+
+    function updateDisplay() {
+      display.value = input;
+    }
+
+    function clearDisplay() {
+      input = '';
+      stack = [];
+      err = false;
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (input.length > 1) {
+        input = input.slice(0, -1);
+        updateDisplay();
+      }
+    }
+
+    function append(num) {
+      if (err) return;
+      if (num === '.' && input.includes('.')) return;
+      input += num;
+      updateDisplay();
+    }
+
+    function calculate() {
+      if (err) return;
+      try {
+        input = eval(input);
+        err = false;
+      } catch (e) {
+        input = '错误';
+        err = true;
+      }
+      updateDisplay();
+    }
+  </script>
+</body>
+</html>

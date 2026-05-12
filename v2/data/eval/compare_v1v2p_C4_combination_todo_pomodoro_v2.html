@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>待办事项番茄钟</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #007AFF, #00e5ff);
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+    }
+    h1 {
+      text-align: center;
+      color: #243143;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .item {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      margin-top: 8px;
+    }
+    .item h2 {
+      color: #243143;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .item p {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      background: #ffffff;
+      border: 2px solid #dde4ee;
+      margin-top: 8px;
+      font-size: 16px;
+      min-height: 40px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #007AFF, #00e5ff);
+      color: white;
+      font-size: 16px;
+      transition: all 0.3s;
+      margin-top: 12px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+    .switch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      position: relative;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    .slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #dfe3ee;
+      transition: all 0.3s;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #243143;
+      transition: all 0.3s;
+    }
+    .item.completed .switch {
+      background: #f8f9fa;
+    }
+    .item.completed .slider {
+      background: #e2e6ee;
+    }
+    .item.completed .slider::before {
+      background: #6b7280;
+    }
+    .timer {
+      text-align: center;
+      color: #6b7280;
+      font-size: 38px;
+      margin-top: 16px;
+      font-weight: 800;
+    }
+    .break {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .control {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+    .countdown {
+      font-size: 24px;
+      color: #243143;
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 800;
+    }
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #eaeef2;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+    .progress .bar {
+      height: 100%;
+      background: linear-gradient(135deg, #007AFF, #00e5ff);
+      border-radius: 10px;
+    }
+    .result {
+      font-size: 16px;
+      text-align: center;
+      margin-top: 12px;
+      color: #6b7280;
+    }
+    .result .text {
+      margin-top: 4px;
+      color: #243143;
+      font-weight: 700;
+    }
+    .result .details {
+      color: #6b7280;
+      margin-top: 4px;
+      font-size: 14px;
+    }
+    .more {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 12px;
+      text-decoration: underline;
+    }
+    ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    li {
+      padding: 12px;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      margin-top: 8px;
+    }
+    .list h3 {
+      color: #243143;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .list p {
+      color: #6b7280;
+      font-size: 14px;
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>待办事项番茄钟</h1>
+    <div class="row">
+      <div class="item" id="todo">
+        <h2>待办事项</h2>
+        <p>添加任务并完成</p>
+        <input class="input" id="todo-input" placeholder="添加待办事项">
+        <button class="btn" onclick="addTodo()">添加</button>
+      </div>
+      <div class="item" id="timer" style="display: none;">
+        <h2>番茄钟</h2>
+        <p>25分钟倒计时</p>
+        <div class="timer" id="timer-countdown">25:00</div>
+        <div class="break" id="timer-break">休息5分钟</div>
+        <button class="btn" onclick="startTimer()">开始</button>
+        <button class="btn" onclick="stopTimer()">停止</button>
+      </div>
+    </div>
+    <ul id="completed" style="display: none;">
+      <h3>已完成</h3>
+      <li id="completed-item-1" class="item completed">
+        <h2>任务1</h2>
+        <p>已完成</p>
+        <button class="btn" onclick="toggleCompleted(1)">取消完成</button>
+      </li>
+      <li id="completed-item-2" class="item completed">
+        <h2>任务2</h2>
+        <p>已完成</p>
+        <button class="btn" onclick="toggleCompleted(2)">取消完成</button>
+      </li>
+    </ul>
+  </div>
+  <script>
+    const todoInput = document.getElementById('todo-input');
+    const todoList = document.getElementById('todo');
+    const timer = document.getElementById('timer');
+    const completedList = document.getElementById('completed');
+    const completedItems = document.querySelectorAll('#completed .item');
+    let timerId = null;
+    let timerCountdown = 1500;
+    let timerBreak = 300;
+    let timerActive = false;
+    let currentTodoIndex = -1;
+
+    function addTodo() {
+      const text = todoInput.value.trim();
+      if (text) {
+        const item = document.createElement('li');
+        item.className = 'item';
+        item.innerHTML = `
+          <h2>${text}</h2>
+          <p>未完成</p>
+          <button class="btn" onclick="toggleCompleted(${todoList.children.length})">完成</button>
+        `;
+        todoList.appendChild(item);
+        todoInput.value = '';
+      }
+    }
+
+    function toggleCompleted(index) {
+      const item = todoList.children[index];
+      item.classList.toggle('completed');
+      if (item.classList.contains('completed')) {
+        completedList.appendChild(item);
+        todoList.removeChild(item);
+      }
+    }
+
+    function startTimer() {
+      if (timerActive) return;
+      timerActive = true;
+      timerCountdown = 1500;
+      timerBreak = 300;
+      timerCountdownElement.textContent = `${Math.floor(timerCountdown / 60)}:${String(Math.floor(timerCountdown % 60)).padStart(2, '0')}`;
+      timerBreakElement.textContent = `休息${Math.floor(timerBreak / 60)}:${String(Math.floor(timerBreak % 60)).padStart(2, '0')}`;
+      updateTimer();
+      updateBreak();
+    }
+
+    function stopTimer() {
+      if (!timerActive) return;
+      timerActive = false;
+      clearInterval(timerId);
+      timerCountdownElement.textContent = '25:00';
+      timerBreakElement.textContent = '休息5分钟';
+    }
+
+    function updateTimer() {
+      if (!timerActive) return;
+      timerCountdown--;
+      if (timerCountdown <= 0) {
+        stopTimer();
+        currentTodoIndex++;
+        if (currentTodoIndex < todoList.children.length) {
+          const item = todoList.children[currentTodoIndex];
+          item.classList.add('completed');
+          completedList.appendChild(item);
+          todoList.removeChild(item);
+        } else {
+          currentTodoIndex = -1;
+          timerCountdownElement.textContent = '25:00';
+          timerBreakElement.textContent = '休息5分钟';
+        }
+        updateTimer();
+      } else {
+        timerCountdownElement.textContent = `${Math.floor(timerCountdown / 60)}:${String(Math.floor(timerCountdown % 60)).padStart(2, '0')}`;
+        timerId = setTimeout(updateTimer, 1000);
+      }
+    }
+
+    function updateBreak() {
+      if (!timerActive) return;
+      timerBreak--;
+      if (timerBreak <= 0) {
+        stopTimer();
+        timerCountdownElement.textContent = '25:00';
+        timerBreakElement.textContent = '休息5分钟';
+      } else {
+        timerBreakElement.textContent = `休息${Math.floor(timerBreak / 60)}:${String(Math.floor(timerBreak % 60)).padStart(2, '0')}`;
+        setTimeout(updateBreak, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+﻿tag,instruction,v1_runnable,v1_viewport,v1_mobile,v1_no_cdn,v1_has_style,v1_has_script,v1_score,v1_length,v2_runnable,v2_viewport,v2_mobile,v2_no_cdn,v2_has_style,v2_has_script,v2_score,v2_length,score_delta,length_delta
+t1_stopwatch,做一个秒表，有开始停止和清零功能,True,True,True,True,True,True,6,7423,True,True,True,True,True,True,6,3823,0,-3600
+t2_pomodoro,做一个番茄钟，25分钟工作5分钟休息，自动切换,True,True,True,True,True,True,6,8428,True,True,True,True,True,True,6,6374,0,-2054
+t3_todo,做一个待办事项列表，可以添加勾选和删除,True,True,True,True,True,True,6,6176,True,True,True,True,True,True,6,5054,0,-1122
+t4_password,做一个随机密码生成器，可以调节长度,True,True,True,True,True,True,6,5371,True,True,True,True,True,True,6,5771,0,400
+t5_guess_num,做一个猜数字游戏，1到100之间猜,True,True,True,True,True,True,6,8118,True,True,True,True,True,True,6,4717,0,-3401

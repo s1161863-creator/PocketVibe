@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>石头剪刀布对战</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+    }
+    .container {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.32);
+      padding: 18px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+      color: #111;
+    }
+    p {
+      text-align: center;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 8px;
+    }
+    input, select, textarea {
+      padding: 12px 14px;
+      background: #fff;
+      color: #222;
+      border: 2px solid #d1d5db;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .result {
+      margin-top: 12px;
+      text-align: center;
+      color: #6b6e73;
+    }
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      text-align: center;
+      color: #6b6e73;
+    }
+    .round {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #111;
+    }
+    .icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 4px;
+      display: grid;
+      place-items: center;
+    }
+    .win, .draw, .loss {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: white;
+      color: #111;
+    }
+    .win {
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+    }
+    .draw {
+      background: #f1f3f5;
+    }
+    .loss {
+      background: linear-gradient(135deg, #ff5733, #ff2d00);
+    }
+    .reset {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      color: #222;
+      border: 2px solid #d1d5db;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .history {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      color: #222;
+      border: 2px solid #d1d5db;
+      border-radius: 14px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+      min-height: 160px;
+      overflow-y: auto;
+    }
+    ul {
+      list-style: none;
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+      color: #6b6e73;
+    }
+    li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f1f3f5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #111;
+    }
+    .total {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #111;
+    }
+    .stats {
+      font-size: 16px;
+      color: #6b6e73;
+      line-height: 1.4;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+      gap: 8px;
+    }
+    .toggle {
+      padding: 12px 14px;
+      background: #fff;
+      color: #222;
+      border: 2px solid #d1d5db;
+      font-weight: 700;
+      border-radius: 14px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .details {
+      font-size: 14px;
+      color: #6b6e73;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul, li, p, button, input, select, textarea { word-wrap: break-word; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>石头剪刀布对战</h1>
+    <p>选择石头/剪刀/布，电脑随机出招，显示本轮胜负；顶部记分板实时更新我方/电脑的累计胜场和平局次数；支持一键重置分数；最近5局结果用小图标滚动显示。</p>
+    <input id="rock" type="radio" name="choice" value="rock" checked>
+    <label for="rock">石头</label>
+    <input id="scissors" type="radio" name="choice" value="scissors">
+    <label for="scissors">剪刀</label>
+    <input id="paper" type="radio" name="choice" value="paper">
+    <label for="paper">布</label>
+    <button onclick="play()">出招</button>
+    <div class="result" id="result">请出招！</div>
+    <div class="scoreboard">
+      <div class="round" id="round">
+        <div class="icon" id="round-1" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+        <div class="icon" id="round-2" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+        <div class="icon" id="round-3" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+        <div class="icon" id="round-4" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+        <div class="icon" id="round-5" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+      </div>
+      <div class="total" id="total">总局数：0</div>
+      <div class="stats">
+        <div class="round" id="win" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+        <div class="round" id="draw" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+        <div class="round" id="loss" style="background: url('https://i.imgur.com/1Kwz9zN.png');"></div>
+      </div>
+    </div>
+    <button onclick="reset()">重置分数</button>
+    <div class="history" id="history"></div>
+  </main>
+  <script>
+    let rounds = 0;
+    let wins = 0;
+    let draws = 0;
+    let losses = 0;
+    const choices = ['rock', 'scissors', 'paper'];
+    const history = document.getElementById('history');
+    const result = document.getElementById('result');
+    const total = document.getElementById('total');
+    const win = document.getElementById('win');
+    const draw = document.getElementById('draw');
+    const loss = document.getElementById('loss');
+    const round1 = document.getElementById('round-1');
+    const round2 = document.getElementById('round-2');
+    const round3 = document.getElementById('round-3');
+    const round4 = document.getElementById('round-4');
+    const round5 = document.getElementById('round-5');
+    function play() {
+      const choice = document.querySelector('input[name="choice"]:checked').value;
+      const computer = choices[Math.floor(Math.random() * 3)];
+      result.textContent = `你：${choice}，电脑：${computer}`;
+      if (choice === computer) {
+        draws++;
+        history.textContent += `<li>平局</li>`;
+      } else if (choice === 'rock' && computer === 'scissors' ||
+                 choice === 'scissors' && computer === 'paper' ||
+                 choice === 'paper' && computer === 'rock') {
+        wins++;
+        history.textContent += `<li>你赢了！</li>`;
+      } else {
+        losses++;
+        history.textContent += `<li>你输了！</li>`;
+      }
+      rounds++;
+      total.textContent = `总局数：${rounds}`;
+      win.textContent = `胜场：${wins}`;
+      draw.textContent = `平局：${draws}`;
+      loss.textContent = `失败：${losses}`;
+      if (rounds === 5) {
+        history.textContent += `<li>最近5局结果：</li>`;
+        for (let i = 0; i < 5; i++) {
+          history.textContent += `<li>${i + 1}. ${choices[i]}</li>`;
+        }
+        rounds = 0;
+        wins = 0;
+        draws = 0;
+        losses = 0;
+      }
+      round1.style.background = `url('https://i.imgur.com/${choices[0]}.png');`;
+      round2.style.background = `url('https://i.imgur.com/${choices[1]}.png');`;
+      round3.style.background = `url('https://i.imgur.com/${choices[2]}.png');`;
+      round4.style.background = `url('https://i.imgur.com/${choices[3]}.png');`;
+      round5.style.background = `url('https://i.imgur.com/${choices[4]}.png');`;
+    }
+    function reset() {
+      rounds = 0;
+      wins = 0;
+      draws = 0;
+      losses = 0;
+      total.textContent = `总局数：${rounds}`;
+      win.textContent = `胜场：${wins}`;
+      draw.textContent = `平局：${draws}`;
+      loss.textContent = `失败：${losses}`;
+      history.textContent = '';
+      round1.style.background = '';
+      round2.style.background = '';
+      round3.style.background = '';
+      round4.style.background = '';
+      round5.style.background = '';
+    }
+  </script>
+</body>
+</html>

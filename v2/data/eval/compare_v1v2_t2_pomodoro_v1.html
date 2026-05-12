@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>番茄钟</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #5975ff, #5975ff);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      color: #243147;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p.sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243147;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #5975ff, #5975ff);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+    }
+    .chips {
+      display: none;
+    }
+    .card {
+      margin-top: 18px;
+    }
+    .success {
+      color: #43b581;
+      font-weight: 700;
+      margin-top: 8px;
+      display: none;
+    }
+    .warning {
+      color: #ff9900;
+      font-weight: 700;
+      margin-top: 8px;
+      display: none;
+    }
+    .error {
+      color: #dc3545;
+      font-weight: 700;
+      margin-top: 8px;
+      display: none;
+    }
+    .btn {
+      display: none;
+    }
+    .reset {
+      background: linear-gradient(135deg, #ff5e62, #ff5e62);
+      color: white;
+    }
+    @media (min-width: 768px) {
+      .card {
+        max-width: none;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>番茄钟</h1>
+    <p class="sub">25分钟工作5分钟休息，自动切换</p>
+    <input 
+      type="number" 
+      id="session-length" 
+      min="5" 
+      value="25" 
+      placeholder="会话时长（分钟）" 
+    >
+    <div class="row">
+      <select id="pomodoro-type">
+        <option value="short">短（5分钟）</option>
+        <option value="long">长（25分钟）</option>
+      </select>
+      <button id="start-pomodoro">开始</button>
+    </div>
+    <div class="panel">
+      <div class="result">00:00</div>
+      <div class="small">会话时长：25分钟</div>
+      <ul class="chips"></ul>
+      <div class="small">休息时长：5分钟</div>
+    </div>
+    <div class="small">
+      <button id="reset-pomodoro">重置</button>
+    </div>
+    <div class="success">会话结束</div>
+    <div class="warning">会话中断</div>
+    <div class="error">会话未开始</div>
+  </div>
+  <script>
+    const sessionLengthInput = document.getElementById("session-length");
+    const pomodoroTypeSelect = document.getElementById("pomodoro-type");
+    const startPomodoroButton = document.getElementById("start-pomodoro");
+    const resultDisplay = document.querySelector(".result");
+    const chipContainer = document.querySelector(".chips");
+    const resetPomodoroButton = document.getElementById("reset-pomodoro");
+    const successMessage = document.querySelector(".success");
+    const warningMessage = document.querySelector(".warning");
+    const errorMessage = document.querySelector(".error");
+    let sessionLength = 25;
+    let pomodoroType = "short";
+    let isSessionRunning = false;
+    let isSessionInterrupted = false;
+    let sessionStartTime;
+    let sessionDuration = sessionLength * 60 * 1000;
+    let breakDuration = 5 * 60 * 1000;
+    let sessionCount = 0;
+
+    function updateSessionDuration() {
+      sessionDuration = sessionLength * 60 * 1000;
+      breakDuration = 5 * 60 * 1000;
+    }
+
+    function updateSessionLength() {
+      sessionLength = parseInt(sessionLengthInput.value);
+      updateSessionDuration();
+      updateSessionDisplay();
+    }
+
+    function updatePomodoroType() {
+      pomodoroType = pomodoroTypeSelect.value;
+      updateSessionDuration();
+      updateSessionDisplay();
+    }
+
+    function updateSessionDisplay() {
+      resultDisplay.textContent = formatTime(sessionDuration);
+    }
+
+    function formatTime(ms) {
+      const minutes = Math.floor(ms / (60 * 1000));
+      const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+      return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    function startPomodoro() {
+      if (isSessionRunning || isSessionInterrupted) {
+        return;
+      }
+      isSessionRunning = true;
+      sessionStartTime = new Date().getTime();
+      sessionCount++;
+      updateSessionDisplay();
+      updateChipContainer();
+      updateSessionDuration();
+      startSessionTimer();
+    }
+
+    function stopPomodoro() {
+      if (!isSessionRunning) {
+        return;
+      }
+      isSessionRunning = false;
+      isSessionInterrupted = false;
+      sessionDuration = 0;
+      updateSessionDisplay();
+      updateChipContainer();
+      stopSessionTimer();
+    }
+
+    function resetPomodoro() {
+      stopPomodoro();
+      sessionCount = 0;
+      sessionLength = 25;
+      updateSessionLength();
+      updatePomodoroType();
+      updateSessionDisplay();
+      updateChipContainer();
+      successMessage.style.display = "none";
+      warningMessage.style.display = "none";
+      errorMessage.style.display = "none";
+      startPomodoroButton.style.display = "block";
+      resetPomodoroButton.style.display = "none";
+    }
+
+    function startSessionTimer() {
+      const intervalId = setInterval(() => {
+        sessionDuration -= 1000;
+        if (sessionDuration <= 0) {
+          stopSessionTimer();
+          if (pomodoroType === "short") {
+            sessionLength = 5;
+            updateSessionLength();
+            updatePomodoroType();
+            updateSessionDuration();
+          } else {
+            sessionLength = 25;
+            updateSessionLength();
+            updatePomodoroType();
+            updateSessionDuration();
+          }
+          if (sessionCount % 4 === 0) {
+            successMessage.style.display = "block";
+            warningMessage.style.display = "none";
+            errorMessage.style.display = "none";
+          } else {
+            warningMessage.style.display = "block";
+            successMessage.style.display = "none";
+            errorMessage.style.display = "none";
+          }
+        } else {
+          updateSessionDisplay();
+        }
+      }, 1000);
+    }
+
+    function stopSessionTimer() {
+      clearInterval(intervalId);
+    }
+
+    function updateChipContainer() {
+      chipContainer.innerHTML = "";
+      for (let i = 0; i < sessionCount; i++) {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = `${i + 1}`;
+        chipContainer.appendChild(chip);
+      }
+    }
+
+    startPomodoroButton.addEventListener("click", startPomodoro);
+    resetPomodoroButton.addEventListener("click", resetPomodoro);
+    sessionLengthInput.addEventListener("input", updateSessionLength);
+    pomodoroTypeSelect.addEventListener("change", updatePomodoroType);
+  </script>
+</body>
+</html>

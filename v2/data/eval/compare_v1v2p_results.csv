@@ -1,0 +1,6 @@
+﻿tag,category,instruction,v1_missing,v2_missing,v1_total,v2_total,delta_total,v1_J,v2_J,v1_I,v2_I,v1_F,v2_F,v1_C,v2_C,v1_S,v2_S,v1_len,v2_len,v1_i_hits,v2_i_hits,i_total_pts
+C1_depth_stopwatch_lap,DEPTH,做一个分段秒表，要求：支持开始/暂停/清零三个操作；点击分段按钮可以记录当前圈速，最多保存10段；每,False,False,92,91,-1,26,22,22,25,20,20,14,14,10,10,14155,9082,7,8,8
+C2_breadth_swim_timer,BREADTH,做一个游泳训练专用秒表，使用场景是湿手操作：字体要特别大（至少60px），按钮要特别大（至少80px,False,False,80,56,-24,15,0,21,25,20,7,14,14,10,10,5743,13141,6,7,7
+C3_reasoning_calc_paren,REASONING,做一个科学计算器：支持 + - × ÷ 括号四则运算，必须正确处理括号优先级和运算顺序；当表达式有语,False,False,95,83,-12,26,14,25,25,20,20,14,14,10,10,13255,4367,8,8,8
+C4_combination_todo_pomodoro,COMBINATION,做一个融合待办事项和番茄钟的工具：上半部分是待办列表，可以添加/勾选/删除任务；点击任意待办项旁边的,False,False,96,93,-3,27,24,25,25,20,20,14,14,10,10,8164,8665,9,9,9
+C5_cross_rps_scoreboard,CROSS_CATEGORY,做一个石头剪刀布对战工具，但带实时记分板：用户选择石头/剪刀/布后，电脑随机出招，显示本轮胜负；同时,False,False,82,83,1,16,14,22,25,20,20,14,14,10,10,7588,8416,8,9,9

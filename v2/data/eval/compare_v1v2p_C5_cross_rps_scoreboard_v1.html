@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>石头剪刀布</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      color: #243147;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p.sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243147;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .round {
+      display: flex;
+      gap: 8px;
+      font-size: 14px;
+      margin-top: 8px;
+      justify-content: center;
+    }
+    .round > * {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      font-weight: 700;
+      color: #ffffff;
+      min-width: 28px;
+    }
+    .stats {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .chips {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .reset {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      padding: 16px 0;
+    }
+    .chips {
+      width: 100%;
+      max-width: 280px;
+      margin: 14px auto;
+    }
+    .chip {
+      margin: 8px 0;
+    }
+    .chips button {
+      width: 100%;
+    }
+    .chips button:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+    .chips button:active {
+      transform: translateY(4px);
+    }
+    .chips button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .chips button:active:disabled {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>石头剪刀布</h1>
+    <p class="sub">记录你的胜负</p>
+    <input type="text" placeholder="玩家选择" id="player-choice" autocomplete="off" />
+    <select id="computer-choice">
+      <option value="">电脑随机出招</option>
+      <option value="rock">石头</option>
+      <option value="scissors">剪刀</option>
+      <option value="paper">布</option>
+    </select>
+    <button onclick="play()">开始对战</button>
+    <div class="panel">
+      <div class="result" id="result"></div>
+      <div class="round" id="round"></div>
+      <div class="stats" id="stats">
+        <div class="stat">
+          <div>你赢了</div>
+          <div id="player-wins" class="chips"></div>
+        </div>
+        <div class="stat">
+          <div>你输了</div>
+          <div id="computer-wins" class="chips"></div>
+        </div>
+        <div class="stat">
+          <div>平局</div>
+          <div id="ties" class="chips"></div>
+        </div>
+      </div>
+      <div class="reset" id="reset">
+        <button onclick="reset()">重置分数</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const choices = ["rock", "scissors", "paper"];
+    const resultMessages = {
+      "rock-scissors": "你赢了",
+      "scissors-paper": "你赢了",
+      "paper-rock": "你赢了",
+      "rock-paper": "你输了",
+      "scissors-rock": "你输了",
+      "paper-scissors": "你输了",
+      "rock-rock": "平局",
+      "scissors-scissors": "平局",
+      "paper-paper": "平局",
+    };
+
+    let playerWins = 0;
+    let computerWins = 0;
+    let ties = 0;
+    let round = 0;
+    let lastRound = null;
+
+    function play() {
+      const playerChoice = document.getElementById("player-choice").value.trim();
+      const computerChoice = document.getElementById("computer-choice").value.trim();
+
+      if (!playerChoice || !computerChoice) {
+        alert("请填写所有选项");
+        return;
+      }
+
+      const result = checkWin(playerChoice, computerChoice);
+      updateResult(result);
+      updateRound();
+      updateStats();
+      updateChips(result);
+      updateLastRound(playerChoice, computerChoice);
+    }
+
+    function checkWin(player, computer) {
+      const index = choices.indexOf(player);
+      const nextIndex = (index + 1) % 3;
+      const nextChoice = choices[nextIndex];
+      const message = resultMessages[player + "-" + nextChoice];
+      return message;
+    }
+
+    function updateResult(message) {
+      document.getElementById("result").textContent = message;
+    }
+
+    function updateRound() {
+      round++;
+      document.getElementById("round").textContent = `第 ${round} 轮`;
+    }
+
+    function updateStats() {
+      document.getElementById("player-wins").textContent = playerWins;
+      document.getElementById("computer-wins").textContent = computerWins;
+      document.getElementById("ties").textContent = ties;
+    }
+
+    function updateChips(result) {
+      const chips = document.querySelectorAll(".chip");
+      chips.forEach(chip => chip.style.opacity = 0.12);
+
+      if (result === "你赢了") {
+        const playerWinsChip = document.getElementById("player-wins");
+        playerWinsChip.style.opacity = 1;
+      } else if (result === "你输了") {
+        const computerWinsChip = document.getElementById("computer-wins");
+        computerWinsChip.style.opacity = 1;
+      } else {
+        const tiesChip = document.getElementById("ties");
+        tiesChip.style.opacity = 1;
+      }
+    }
+
+    function updateLastRound(player, computer) {
+      const lastRoundElement = document.getElementById("last-round");
+      if (lastRound !== null) {
+        lastRoundElement.textContent = "";
+      }
+
+      if (lastRound !== null && lastRound !== player && lastRound !== computer) {
+        lastRoundElement.textContent = `上一局: ${lastRound}`;
+      }
+    }
+
+    function reset() {
+      playerWins = 0;
+      computerWins = 0;
+      ties = 0;
+      round = 0;
+      lastRound = null;
+
+      updateResult("你赢了");
+      updateRound();
+      updateStats();
+      updateChips("你赢了");
+      updateLastRound(null);
+    }
+  </script>
+</body>
+</html>

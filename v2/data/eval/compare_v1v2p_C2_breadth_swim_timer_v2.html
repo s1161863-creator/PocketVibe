@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>游泳训练秒表</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #243154, #334165);
+    }
+    .container {
+      width: 100%;
+      max-width: 380px;
+      background: #202d40;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.35);
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+    p {
+      text-align: center;
+      color: #a0aec0;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 12px 14px;
+      background: #283245;
+      color: #ffffff;
+      border: 2px solid #465063;
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #243154, #334165);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .result {
+      font-size: 38px;
+      text-align: center;
+      color: #ffffff;
+      margin-top: 16px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .stats {
+      font-size: 16px;
+      text-align: center;
+      color: #a0aec0;
+      margin-top: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-transform: capitalize;
+    }
+    .chip {
+      display: inline-block;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .list {
+      margin-top: 12px;
+      font-size: 14px;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      min-height: 100px;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .time {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+    .unit {
+      font-size: 14px;
+      color: #a0aec0;
+      text-align: end;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .toggle, .reset {
+      flex: 1;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 8px;
+      font-weight: 700;
+    }
+    .toggle {
+      background: linear-gradient(135deg, #243154, #334165);
+      color: white;
+    }
+    .reset {
+      background: #3f4866;
+      color: white;
+    }
+    .indicator {
+      font-size: 32px;
+      font-weight: 800;
+      text-align: center;
+      color: #ffffff;
+      margin-top: 8px;
+      line-height: 1.2;
+    }
+    .details {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #a0aec0;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .details > div {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .info {
+      font-size: 16px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .stats > div {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .stat {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+    .sub {
+      font-size: 14px;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 4px;
+      text-transform: capitalize;
+    }
+    .small {
+      font-size: 12px;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 4px;
+      text-transform: capitalize;
+    }
+    canvas {
+      width: 100%;
+      height: 240px;
+      border-radius: 18px;
+      background: #202d40;
+      margin-top: 12px;
+      touch-action: none;
+    }
+    .key {
+      font-size: 14px;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 8px;
+      text-transform: capitalize;
+    }
+    .keyrow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .keyrow > * {
+      font-size: 12px;
+      text-align: center;
+    }
+    .keyrow > :first-child {
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .keyrow > :last-child {
+      text-align: right;
+      margin-top: 4px;
+    }
+    .copy {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      color: #6b7280;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-block;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #243154, #334165);
+      transition: 0.2s;
+    }
+    .copy:hover {
+      background: linear-gradient(135deg, #283245, #364159);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>游泳训练秒表</h1>
+    <p>用手机轻松记录每一趟游泳的时间。</p>
+    <input id="time" type="number" min="0" value="0" placeholder="00:00" style="display: none;">
+    <div class="result" id="display" style="font-size: 60px; text-align: center; color: #ffffff; margin-top: 14px; font-weight: 800; line-height: 1.2;"></div>
+    <div class="stats" id="stats" style="margin-top: 12px; font-size: 14px; text-align: center; font-weight: 700; line-height: 1.4; text-transform: capitalize;">
+      <div class="chip" id="total">00:00</div>
+      <div class="chip" id="distance">000m</div>
+      <div class="chip" id="laps">0</div>
+    </div>
+    <div class="controls" style="margin-top: 16px;">
+      <button id="start" class="toggle" onclick="start()">开始</button>
+      <button id="pause" class="toggle" onclick="pause()">暂停</button>
+      <button id="reset" class="reset" onclick="reset()">重置</button>
+    </div>
+    <div class="indicator" id="indicator" style="margin-top: 12px; font-size: 38px; text-align: center; color: #ffffff; margin-bottom: 16px; font-weight: 800; line-height: 1.2;"></div>
+    <div class="details" style="margin-top: 12px; font-size: 14px; text-align: center; font-weight: 700; line-height: 1.4;">
+      <div class="info" id="laps-info">laps</div>
+      <div class="info" id="laps-time">00:00</div>
+      <div class="info" id="distance-info">distance</div>
+      <div class="info" id="distance-time">00:00</div>
+    </div>
+    <canvas id="canvas" width="320" height="240"></canvas>
+    <div class="keyrow">
+      <div class="key" id="key-1">1</div>
+      <div class="key" id="key-2">2</div>
+      <div class="key" id="key-3">3</div>
+    </div>
+    <div class="keyrow">
+      <div class="key" id="key-4">4</div>
+      <div class="key" id="key-5">5</div>
+      <div class="key" id="key-6">6</div>
+    </div>
+    <div class="keyrow">
+      <div class="key" id="key-7">7</div>
+      <div class="key" id="key-8">8</div>
+      <div class="key" id="key-9">9</div>
+    </div>
+    <div class="keyrow">
+      <div class="key" id="key-0">0</div>
+      <div class="key" id="key-.">.</div>
+      <div class="key" id="key-enter">enter</div>
+    </div>
+    <div class="copy" id="copy" onclick="copy()">复制结果</div>
+  </div>
+  <script>
+    const display = document.getElementById('display');
+    const stats = document.getElementById('stats');
+    const laps = document.getElementById('laps');
+    const lapsTime = document.getElementById('laps-time');
+    const distance = document.getElementById('distance');
+    const distanceTime = document.getElementById('distance-time');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', 'enter'];
+    let startTime = null;
+    let elapsedTime = 0;
+    let lapsCount = 0;
+    let distanceCount = 0;
+    let running = false;
+    let input = document.getElementById('time');
+    let inputText = '';
+    let inputIndex = 0;
+    let lastInputTime = 0;
+
+    function start() {
+      if (!running) {
+        startTime = performance.now();
+        running = true;
+        input.style.display = 'block';
+        updateDisplay();
+      }
+    }
+
+    function pause() {
+      if (running) {
+        elapsedTime += performance.now() - startTime;
+        running = false;
+        input.style.display = 'none';
+        updateDisplay();
+      }
+    }
+
+    function reset() {
+      if (running) {
+        pause();
+      }
+      elapsedTime = 0;
+      lapsCount = 0;
+      distanceCount = 0;
+      display.textContent = '00:00';
+      stats.children[0].textContent = '00:00';
+      stats.children[1].textContent = '000m';
+      stats.children[2].textContent = '0';
+      inputText = '';
+      inputIndex = 0;
+      lastInputTime = 0;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const total = elapsedTime / 1000;
+      const totalMinutes = Math.floor(total / 60);
+      const totalSeconds = Math.floor(total % 60);
+      const totalMeters = Math.floor(distanceCount * 50);
+      const laps = lapsCount;
+      const lapsTime = laps > 0 ? total / laps : '00:00';
+      const distance = totalMeters > 0 ? totalMeters / 50 : '000m';
+      const distanceTime = distance > 0 ? total / distance : '00:00';
+      display.textContent = `${totalMinutes.toString().padStart(2, '0')}:${totalSeconds.toString().padStart(2, '0')}`;
+      stats.children[0].textContent = `${lapsMinutes.toString().padStart(2, '0')}:${lapsSeconds.toString().padStart(2, '0')}`;
+      stats.children[1].textContent = `${distanceMeters.toString().padStart(3, '0')}m`;
+      stats.children[2].textContent = laps;
+      inputText = totalMinutes.toString().padStart(2, '0') + ':' + totalSeconds.toString().padStart(2, '0');
+      input.value = inputText;
+      inputIndex = inputText.length;
+      lastInputTime = performance.now();
+      draw();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const total = elapsedTime / 1000;
+      const totalMinutes = Math.floor(total / 60);
+      const totalSeconds = Math.floor(total % 60);
+      const totalMeters = Math.floor(distanceCount * 50);
+      const laps = lapsCount;
+      const lapsTime = laps > 0 ? total / laps : '00:00';
+      const distance = totalMeters > 0 ? totalMeters / 50 : '000m';
+      const distanceTime = distance > 0 ? total / distance : '00:00';
+      ctx.font = '50px "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${totalMinutes.toString().padStart(2, '0')}:${totalSeconds.toString().padStart(2, '0')}`, canvas.width / 2, 180);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${lapsMinutes.toString().padStart(2, '0')}:${lapsSeconds.toString().padStart(2, '0')}`, canvas.width / 2, 260);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${distanceMeters.toString().padStart(3, '0')}m`, canvas.width / 2, 340);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${distanceTime.toString().padStart(5, '0')}`, canvas.width / 2, 420);
+      ctx.font = '14px "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+      ctx.fillStyle = '#a0aec0';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${laps} laps`, canvas.width / 2, 500);
+      ctx.fillText(`${distance} meters`, canvas.width / 2, 580);
+      ctx.fillText(`${lapsTime} laps`, canvas.width / 2, 660);
+      ctx.fillText(`${distanceTime} meters`, canvas.width / 2, 740);
+    }
+
+    function keydown(e) {
+      if (keys.includes(e.key)) {
+        e.preventDefault();
+        if (e.key === '0') {
+          inputText = inputText.slice(0, -1);
+        } else if (e.key === '.') {
+          inputText = inputText + '.';
+        } else if (e.key === 'enter') {
+          const time = parseInt(inputText, 10) * 1000;
+          if (time > 0) {
+            elapsedTime += time;
+            lapsCount++;
+            distanceCount += 1;
+            updateDisplay();
+            inputText = '';
+            inputIndex = 0;
+            lastInputTime = 0;
+            draw();
+          }
+        } else {
+          inputText = inputText.slice(0, -1) + e.key;
+        }
+        input.value = inputText;
+        inputIndex = inputText.length;
+        lastInputTime = performance.now();
+      }
+    }
+
+    function keyup(e) {
+      if (e.key === 'Backspace') {
+        inputText = inputText.slice(

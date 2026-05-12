@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>科学计算器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #5975d6, #345b9b);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      color: #243147;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    p.sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243147;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #5975d6, #345b9b);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+    }
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+    }
+    .history-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-date {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: right;
+    }
+    .history-result {
+      font-weight: 700;
+      text-align: right;
+    }
+    .btn-panel {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 15px 26px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .large {
+      font-size: 18px;
+      background: linear-gradient(135deg, #5975d6, #345b9b);
+      color: white;
+    }
+    .small {
+      font-size: 14px;
+    }
+    .clear {
+      background: #f4f6f8;
+      color: #6b7280;
+    }
+    .undo {
+      background: #f9f9f9;
+      color: #6b7280;
+    }
+    .result {
+      font-size: 38px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.2;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>科学计算器</h1>
+    <p class="sub">支持 + - × ÷ 括号四则运算，必须正确处理括号优先级和运算顺序；当表达式有语法错误（如括号不匹配/连续运算符）时，在结果区实时显示红色错误提示；支持回退键和清零键。</p>
+    <input
+      type="text"
+      id="expression"
+      placeholder="输入算式"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <div class="row">
+      <div class="chips">
+        <div class="chip">C</div>
+        <div class="chip">CE</div>
+      </div>
+      <div class="chips">
+        <div class="chip">7</div>
+        <div class="chip">8</div>
+        <div class="chip">9</div>
+        <div class="chip">÷</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="chips">
+        <div class="chip">4</div>
+        <div class="chip">5</div>
+        <div class="chip">6</div>
+        <div class="chip">*</div>
+      </div>
+      <div class="chips">
+        <div class="chip">1</div>
+        <div class="chip">2</div>
+        <div class="chip">3</div>
+        <div class="chip">-</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="chips">
+        <div class="chip">0</div>
+        <div class="chip">.</div>
+      </div>
+      <div class="chips">
+        <div class="chip">+/-</div>
+        <div class="chip">+</div>
+        <div class="chip">=</div>
+        <div class="chip">%</div>
+      </div>
+    </div>
+    <div class="btn-panel">
+      <button class="large clear" id="clear">C</button>
+      <button class="large undo" id="undo">CE</button>
+      <button class="large" id="back">←</button>
+      <button class="large" id="percent">%</button>
+      <button class="large" id="seven">7</button>
+      <button class="large" id="eight">8</button>
+      <button class="large" id="nine">9</button>
+      <button class="large" id="divide">÷</button>
+      <button class="large" id="four">4</button>
+      <button class="large" id="five">5</button>
+      <button class="large" id="six">6</button>
+      <button class="large" id="multiply">*</button>
+      <button class="large" id="one">1</button>
+      <button class="large" id="two">2</button>
+      <button class="large" id="three">3</button>
+      <button class="large" id="minus">-</button>
+      <button class="large result" id="result">=</button>
+      <button class="small" id="zero">0</button>
+      <button class="small" id="decimal">.</button>
+      <button class="small" id="plus">+</button>
+    </div>
+    <div class="panel">
+      <div id="expression-area" class="result"></div>
+      <div id="history"></div>
+    </div>
+  </div>
+  <script>
+    const expressionArea = document.getElementById("expression-area");
+    const history = document.getElementById("history");
+    const expressionInput = document.getElementById("expression");
+    const clearButton = document.getElementById("clear");
+    const undoButton = document.getElementById("undo");
+    const backspaceButton = document.getElementById("back");
+    const percentButton = document.getElementById("percent");
+    const sevenButton = document.getElementById("seven");
+    const eightButton = document.getElementById("eight");
+    const nineButton = document.getElementById("nine");
+    const divideButton = document.getElementById("divide");
+    const fourButton = document.getElementById("four");
+    const fiveButton = document.getElementById("five");
+    const sixButton = document.getElementById("six");
+    const multiplyButton = document.getElementById("multiply");
+    const oneButton = document.getElementById("one");
+    const twoButton = document.getElementById("two");
+    const threeButton = document.getElementById("three");
+    const minusButton = document.getElementById("minus");
+    const resultButton = document.getElementById("result");
+    const zeroButton = document.getElementById("zero");
+    const decimalButton = document.getElementById("decimal");
+    const plusButton = document.getElementById("plus");
+
+    let historyItems = [];
+    let expression = "";
+    let result = null;
+
+    function updateExpressionArea() {
+      expressionArea.textContent = expression;
+    }
+
+    function updateHistory() {
+      history.innerHTML = "";
+      historyItems.forEach((item, index) => {
+        const date = new Date(item.timestamp).toLocaleString();
+        const result = item.result;
+        const historyItem = document.createElement("div");
+        historyItem.classList.add("history-item");
+        historyItem.innerHTML = `
+          <span class="history-date">${date}</span>
+          <span class="history-result">${result}</span>
+        `;
+        history.appendChild(historyItem);
+      });
+    }
+
+    function calculate() {
+      try {
+        result = eval(expression);
+        expression = result.toString();
+        updateExpressionArea();
+        updateHistory();
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          result = "语法错误";
+          expression = "";
+          updateExpressionArea();
+          updateHistory();
+        }
+      }
+    }
+
+    function handleInput(event) {
+      const key = event.key;
+      if (key === "Enter") {
+        calculate();
+      } else if (key === "Backspace") {
+        if (expression.length > 0) {
+          expression = expression.slice(0, -1);
+          updateExpressionArea();
+        }
+      } else if (key === "C") {
+        expression = "";
+        result = null;
+        updateExpressionArea();
+        updateHistory();
+      } else if (key === "CE") {
+        expression = "";
+        updateExpressionArea();
+      } else if (key === "0") {
+        expression += "0";
+        updateExpressionArea();
+      } else if (key === ".") {
+        if (!expression.includes(".")) {
+          expression += ".";
+          updateExpressionArea();
+        }
+      } else if (key === "+/-") {
+        if (expression === "") {
+          result = 0;
+          expression = "0";
+          updateExpressionArea();
+          updateHistory();
+        } else if (result !== null) {
+          result = -result;
+          expression = result.toString();
+          updateExpressionArea();
+          updateHistory();
+        } else {
+          expression = expression * -1;
+          updateExpressionArea();
+          updateHistory();
+        }
+      } else if (key === "+") {
+        if (expression !== "") {
+          expression += "+";
+          updateExpressionArea();
+        }
+      } else if (key === "-") {
+        if (expression !== "") {
+          expression += "-";
+          updateExpressionArea();
+        }
+      } else if (key === "*") {
+        if (expression !== "") {
+          expression += "*";
+          updateExpressionArea();
+        }
+      } else if (key === "/") {
+        if (expression !== "") {
+          expression += "/";
+          updateExpressionArea();
+        }
+      } else if (key >= "1" && key <= "9") {
+        expression += key;
+        updateExpressionArea();
+      }
+    }
+
+    expressionInput.addEventListener("input", handleInput);
+    clearButton.addEventListener("click", () => {
+      expression = "";
+      result = null;
+      updateExpressionArea();
+      updateHistory();
+    });
+    undoButton.addEventListener("click", () => {
+      if (expression.length > 0) {
+        expression = expression.slice(0, -1);
+        updateExpressionArea();
+      }
+    });
+    backspaceButton.addEventListener("click", () => {
+      if (expression.length > 0) {
+        expression = expression.slice(0, -1);
+        updateExpressionArea();
+      }
+    });
+    percentButton.addEventListener("click", () => {
+      if (expression !== "") {
+        expression += "%";
+        updateExpressionArea();
+      }
+    });
+    sevenButton.addEventListener("click", () => {
+      expression += "7";
+      updateExpressionArea();
+    });
+    eightButton.addEventListener("click", () => {
+      expression += "8";
+      updateExpressionArea();
+    });
+    nineButton.addEventListener("click", () => {
+      expression += "9";
+      updateExpressionArea();
+    });
+    divideButton.addEventListener("click", () => {
+      if (expression !== "") {
+        expression += "/";
+        updateExpressionArea();
+      }
+    });
+    fourButton.addEventListener("click", () => {
+      expression += "4";
+      updateExpressionArea();
+    });
+    fiveButton.addEventListener("click", () => {
+      expression += "5";
+      updateExpressionArea();
+    });
+    sixButton.addEventListener("click", () => {
+      expression += "6";
+      updateExpressionArea();
+    });
+    multiplyButton.addEventListener("click", () => {
+      if (expression !== "") {
+        expression += "*";
+        updateExpressionArea();
+      }
+    });
+    oneButton.addEventListener("click", () => {
+      expression += "1";
+      updateExpressionArea();
+    });
+    twoButton.addEventListener("click", () => {
+      expression += "2";
+      updateExpressionArea();
+    });
+    threeButton.addEventListener("click", () => {
+      expression += "3";
+      updateExpressionArea();
+    });
+    minusButton.addEventListener("click", () => {
+      if (expression !== "") {
+        expression += "-";
+        updateExpressionArea();
+      }
+    });
+    resultButton.addEventListener("click", calculate);
+    zeroButton.addEventListener("click", () => {
+      expression += "0";
+      updateExpressionArea();
+    });
+    decimalButton.addEventListener("click", () => {
+      if (!expression.includes(".")) {
+        expression += ".";
+        updateExpressionArea();
+      }
+    });
+    plusButton.addEventListener("click", () => {
+      if (expression !== "") {
+        expression += "+";
+        updateExpressionArea();
+      }
+    });
+  </script>
+</body>
+</html>

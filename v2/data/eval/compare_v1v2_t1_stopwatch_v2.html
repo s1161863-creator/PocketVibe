@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>秒表</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+      padding: 18px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #243144;
+    }
+    p {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      margin-top: 8px;
+    }
+    input, select, textarea {
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #243144;
+      border: 2px solid #dde4ee;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      padding: 13px 14px;
+      background: linear-gradient(135deg, #00c6ff, #007aff);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .switch {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+    }
+    .checkbox {
+      flex: 1;
+      margin-top: 8px;
+    }
+    .result {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      color: #6b7280;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .control {
+      flex: 1;
+      margin: 0 8px;
+    }
+    .small {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .guide {
+      text-align: center;
+      color: #6b7280;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .link {
+      display: block;
+      margin-top: 10px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+    .copy {
+      display: block;
+      margin-top: 8px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 12px;
+    }
+    .copy button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 14px;
+      background: #fff;
+      color: #243144;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>秒表</h1>
+    <p>点击开始，点击停止，点击清零</p>
+    <input type="number" id="time" value="0" min="0" disabled>
+    <div class="controls">
+      <button onclick="start()">开始</button>
+      <button onclick="stop()">停止</button>
+      <button onclick="reset()">清零</button>
+    </div>
+  </div>
+  <script>
+    let startTime, elapsedTime = 0, timer;
+    let isRunning = false;
+    function start() {
+      if (isRunning) return;
+      isRunning = true;
+      startTime = Date.now() - elapsedTime;
+      timer = setInterval(() => {
+        elapsedTime = Date.now() - startTime;
+        document.getElementById('time').value = elapsedTime / 1000.toFixed(2);
+      }, 10);
+    }
+    function stop() {
+      if (!isRunning) return;
+      isRunning = false;
+      clearInterval(timer);
+    }
+    function reset() {
+      isRunning = false;
+      elapsedTime = 0;
+      document.getElementById('time').value = '0';
+    }
+  </script>
+</body>
+</html>
