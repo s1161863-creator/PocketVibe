@@ -1,0 +1,292 @@
+PocketVibe data pipeline handoff
+Time: 2026-04-23
+Folder: D:\New Project in D\SecondPre\Enoch\F
+
+1. What has been done
+- Read and understood the project document: PocketVibe 完整执行指南.docx
+- Implemented the data pipeline scripts under scripts\:
+  - 00_create_seeds.py
+  - 01a_augment_instructions.py
+  - 01b_generate_new_tools.py
+  - 01c_merge_all.py
+  - 02_validate_data.py
+  - 02b_split_data.py
+- Added .env.example
+- Seed generation works locally
+- 01a already completed successfully
+- 01b was changed from single-process to 4-shard parallel mode
+
+2. Current progress snapshot
+- Seed file:
+  - data\seed\seed_examples.jsonl
+  - 50 rows
+- 01a augmented file:
+  - data\processed\augmented_instructions.jsonl
+  - 550 rows
+- 01b base single-process output:
+  - data\processed\new_tools.jsonl
+  - 28 rows
+- 01b parallel shard outputs right now:
+  - data\processed\new_tools.shard0.jsonl = 9 rows
+  - data\processed\new_tools.shard1.jsonl = 10 rows
+  - data\processed\new_tools.shard2.jsonl = 9 rows
+  - data\processed\new_tools.shard3.jsonl = 10 rows
+- Total generated for 01b so far:
+  - 66 rows total = 28 base + 38 shard rows
+- The 01b instruction list currently has 85 total instructions in script 01b
+- Remaining rough count at this snapshot:
+  - about 19 rows still not generated
+
+3. Running processes at snapshot
+- 4 python processes are running for parallel 01b
+- Start time for all 4 current shard workers:
+  - 2026-04-23 14:19:58
+
+4. Important logs
+- 01a log:
+  - logs\01a_augment.log
+- 01b old status summary:
+  - logs\01b_status.log
+- 01b parallel logs:
+  - logs\01b_shard0.log
+  - logs\01b_shard1.log
+  - logs\01b_shard2.log
+  - logs\01b_shard3.log
+- 01b parallel stderr logs:
+  - logs\01b_shard0.err.log
+  - logs\01b_shard1.err.log
+  - logs\01b_shard2.err.log
+  - logs\01b_shard3.err.log
+- At this snapshot all shard err logs were empty
+
+5. Important code change
+- scripts\01b_generate_new_tools.py now supports:
+  - PV_NUM_SHARDS
+  - PV_SHARD_INDEX
+  - PV_OUTPUT_FILE
+- It also flushes logs immediately so shard logs update in real time
+
+6. What happened earlier
+- The first attempt to run DeepSeek from the sandbox failed with network restriction:
+  - APIConnectionError / WinError 10013
+- Then unrestricted network execution was used and 01a completed
+- The first 4-way parallel launch failed because environment variables were quoted incorrectly
+- That launch was fixed by switching to cmd.exe /c set ... && python -u ...
+
+7. What should be done next
+- Wait for all 4 shard workers to finish
+- Then merge shard outputs into the main 01b output or merge them directly in 01c
+- Then run:
+  - python scripts\01c_merge_all.py
+  - python scripts\02_validate_data.py
+  - python scripts\02b_split_data.py
+
+8. Recommended merge approach after shards finish
+- Combine:
+  - data\processed\new_tools.jsonl
+  - data\processed\new_tools.shard0.jsonl
+  - data\processed\new_tools.shard1.jsonl
+  - data\processed\new_tools.shard2.jsonl
+  - data\processed\new_tools.shard3.jsonl
+- Then deduplicate by instruction text
+- Easiest path:
+  - either append shard files into new_tools.jsonl and then run 01c
+  - or patch 01c to read the shard files too
+
+9. Commands to inspect progress manually
+- Count rows:
+  - (Get-Content data\processed\new_tools.jsonl | Measure-Object -Line).Lines
+  - (Get-Content data\processed\new_tools.shard0.jsonl | Measure-Object -Line).Lines
+  - (Get-Content data\processed\new_tools.shard1.jsonl | Measure-Object -Line).Lines
+  - (Get-Content data\processed\new_tools.shard2.jsonl | Measure-Object -Line).Lines
+  - (Get-Content data\processed\new_tools.shard3.jsonl | Measure-Object -Line).Lines
+- View shard logs:
+  - Get-Content -Tail 30 logs\01b_shard0.log
+  - Get-Content -Tail 30 logs\01b_shard1.log
+  - Get-Content -Tail 30 logs\01b_shard2.log
+  - Get-Content -Tail 30 logs\01b_shard3.log
+- View python processes:
+  - Get-Process | Where-Object { $_.ProcessName -like 'python*' }
+
+10. Security note
+- API keys were used in environment variables only
+- API keys are intentionally not written into this txt file
+
+11. Training estimate already discussed
+- Data generation:
+  - uses API, almost no GPU
+  - local D: drive is fine
+- QLoRA training estimate:
+  - School A16 16GB: about 3-6GB VRAM, 24-32GB RAM recommended, around 1-3 hours
+  - Local RTX 5070: should also run this 1.5B 4-bit QLoRA setup, about 4-7GB VRAM, around 40 minutes to 2 hours depending on setup
+
+12. Updated training estimate after checking local GPU
+- Snapshot date:
+  - 2026-04-23
+- Local GPU detected:
+  - NVIDIA GeForce RTX 5070 Laptop GPU
+  - VRAM: 8151 MiB
+- Current dataset size:
+  - train.jsonl = 480
+  - val.jsonl = 70
+- Current training script:
+  - 3 epochs
+  - batch size 1
+  - gradient_accumulation_steps 8
+  - max_seq_length 2048
+  - QLoRA 4-bit on Qwen2.5-Coder-1.5B-Instruct
+
+- A16 16GB estimate with current script:
+  - Recommended platform
+  - VRAM:
+    - roughly 5-8GB during training
+    - 16GB is enough with margin
+  - System RAM:
+    - recommend 24-32GB
+  - Time:
+    - roughly 45-90 minutes
+    - conservative upper bound around 2 hours if I/O or eval is slow
+
+- Local RTX 5070 Laptop 8GB estimate with current script:
+  - Risk:
+    - current config may OOM at max_seq_length 2048
+  - VRAM:
+    - 8GB is very tight
+    - likely unstable or directly OOM without reducing sequence length
+  - System RAM:
+    - recommend 24-32GB
+  - Time if forced to use current config and it barely fits:
+    - around 1.5-3 hours
+  - More realistic local plan:
+    - reduce max_seq_length to 1024
+    - if needed raise gradient_accumulation_steps from 8 to 16
+    - then estimated time is around 2-4 hours
+
+- Recommendation:
+  - Use school A16 16GB for the actual training run
+  - Use local laptop only for quick smoke tests or reduced-config experiments
+
+13. Training troubleshooting log (2026-04-23)
+- Log verification and generation completion:
+  - Checked all logs under logs\ and confirmed 01b shard runs completed successfully.
+  - Confirmed row counts:
+    - data\processed\new_tools.jsonl = 28
+    - data\processed\new_tools.shard0.jsonl = 15
+    - data\processed\new_tools.shard1.jsonl = 14
+    - data\processed\new_tools.shard2.jsonl = 14
+    - data\processed\new_tools.shard3.jsonl = 14
+  - Total = 85, matching 01b instruction count.
+
+- Dependency/bootstrap fixes:
+  - Added training dependency file:
+    - requirements-train.txt
+  - Added clear runtime hint in scripts\03_train_qlora.py when trl is missing.
+  - Updated requirements-train.txt to pin trl==0.10.1 to avoid liger_kernel import chain issue seen with newer trl build in this environment.
+
+- Slurm environment fixes:
+  - Updated slurm\train.slurm to use personal venv instead of shared read-only env:
+    - from /opt/apps/python-envs/week07/bin/activate
+    - to ~/venvs/pv-train/bin/activate
+  - Added interpreter diagnostics in slurm output:
+    - which python
+    - python -V
+
+- Hugging Face cache/network mode fix:
+  - Root cause observed:
+    - offline mode enabled while cache did not yet contain Qwen config/model files.
+  - Changed defaults to online-first (still override-able):
+    - scripts\03_train_qlora.py: HF_HUB_OFFLINE default 0
+    - slurm\train.slurm: export HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-0}
+
+- bitsandbytes compatibility fix:
+  - Root cause observed:
+    - installed bitsandbytes in venv has no GPU backend on this cluster image.
+  - Added switch in training script:
+    - PV_USE_4BIT (1/0)
+  - Defaulted job to stable non-4bit path:
+    - slurm\train.slurm: export PV_USE_4BIT=${PV_USE_4BIT:-0}
+  - Log now prints whether 4bit is ON/OFF.
+
+- CUDA OOM mitigation (runtime OOM at first training step):
+  - Added configurable low-memory knobs in scripts\03_train_qlora.py:
+    - PV_MAX_SEQ_LENGTH (default 1024)
+    - PV_GRAD_ACC_STEPS (default 16)
+    - PV_USE_GRAD_CHECKPOINTING (default 1)
+  - Wired same defaults in slurm\train.slurm and added allocator hint:
+    - export PV_MAX_SEQ_LENGTH=${PV_MAX_SEQ_LENGTH:-1024}
+    - export PV_GRAD_ACC_STEPS=${PV_GRAD_ACC_STEPS:-16}
+    - export PV_USE_GRAD_CHECKPOINTING=${PV_USE_GRAD_CHECKPOINTING:-1}
+    - export PYTORCH_CUDA_ALLOC_CONF=${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}
+
+- Backward-pass grad error fix:
+  - Root cause observed after memory tuning:
+    - RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
+  - Applied LoRA + checkpointing compatibility settings in scripts\03_train_qlora.py:
+    - model.config.use_cache = False (when gradient checkpointing is enabled)
+    - model.enable_input_require_grads() when available
+
+- Current operational guidance:
+  - Re-upload latest files before each rerun:
+    - scripts\03_train_qlora.py
+    - slurm\train.slurm
+    - requirements-train.txt (if server copy outdated)
+  - Submit with:
+    - sbatch slurm/train.slurm
+  - If memory still tight, submit with smaller sequence length:
+    - PV_MAX_SEQ_LENGTH=768 sbatch slurm/train.slurm
+    - (fallback) PV_MAX_SEQ_LENGTH=512 sbatch slurm/train.slurm
+
+14. Current environment and status snapshot (2026-04-23 latest)
+- Local workspace (Windows):
+  - Folder: D:\New Project in D\SecondPre\Enoch\F
+  - Updated files are being uploaded with scp to:
+    - student07@aaillm.eduhk.hk:~/PocketVibe/
+
+- Server/runtime environment:
+  - Login host: aaillm.eduhk.hk
+  - Working folder: ~/PocketVibe
+  - Active training venv: ~/venvs/pv-train
+  - Slurm submit file in use: slurm/train.slurm
+  - Python path in train log:
+    - /home/student07/venvs/pv-train/bin/python
+  - Python version in train log:
+    - 3.10.12
+
+- Latest confirmed training configuration (run that completed):
+  - Base model: Qwen/Qwen2.5-Coder-1.5B-Instruct
+  - 4bit mode: OFF (LoRA bf16 path)
+  - max_seq_length: 1024
+  - gradient_accumulation_steps: 16
+  - gradient_checkpointing: True
+  - Effective batch size: 16
+  - Epochs: 3
+
+- Latest confirmed successful run:
+  - Job ID: 1395
+  - Status: COMPLETED
+  - Observed progress reached 90/90 steps.
+  - train_runtime: 1701.2046s (~28m21s)
+  - train_loss: 0.2528
+  - eval_loss trend:
+    - epoch 1.0: 0.18057
+    - epoch 2.0: 0.13681
+    - epoch 3.0: 0.13448
+  - Output artifacts:
+    - outputs/qlora-run1/final_adapter
+    - logs/train_log.json
+
+- Current warnings/non-blocking notes:
+  - transformers warning about TRANSFORMERS_CACHE deprecation appears but does not block run.
+  - tokenizers fork/parallelism warning appears during inference/eval flow; non-fatal.
+  - bitsandbytes GPU backend warning appears in this env, but does not block when PV_USE_4BIT=0.
+
+- Current quality/evaluation state:
+  - Manual sample generation produced HTML-style answer but one sample was truncated.
+  - Recommended inference-side fix for eval:
+    - increase max_new_tokens (for example 1400-1600)
+    - use deterministic decode for structure checks (do_sample=False)
+    - enforce prompt constraint to end at </html>
+
+- Immediate next step:
+  - Keep current trained adapter as baseline (already successful).
+  - Run 10-sample validation generation check and decide whether a second fine-tune round is necessary.
