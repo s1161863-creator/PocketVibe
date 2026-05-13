@@ -1,5 +1,7 @@
 # PocketVibe — Mobile Micro-App Generation using Qwen2.5-Coder-1.5B with QLoRA Fine-tuning
 
+#my password has changed, ask me if you need to login student07
+
 > **Natural Language → Complete HTML Micro-App, in Seconds**
 
 | Item | Detail |
